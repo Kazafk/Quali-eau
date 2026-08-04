@@ -1,6 +1,6 @@
 from datetime import date
 
-from pipeline.aggregation import ponderation_temporelle, moyenne_ponderee
+from pipeline.aggregation import ponderation_temporelle, moyenne_ponderee, valeur_somme_reglementaire
 from pipeline.models import Mesure
 
 
@@ -29,3 +29,32 @@ def test_moyenne_ponderee_deux_mesures():
 
 def test_moyenne_ponderee_liste_vide():
     assert moyenne_ponderee([], date(2026, 6, 15)) is None
+
+
+def test_somme_reglementaire_total_numerique_fait_foi():
+    # Le champ total est numérique (non sous LQ) : il fait foi, peu importe les composantes.
+    total = Mesure(valeur=0.30, sous_lq=False, date_prelevement=date(2026, 6, 15))
+    composantes = [Mesure(valeur=999.0, sous_lq=False, date_prelevement=date(2026, 6, 15))]
+    assert valeur_somme_reglementaire(total, composantes) == 0.30
+
+
+def test_somme_reglementaire_recalcul_par_composantes():
+    # Total absent -> recalcul : LQ/2 pour les composantes sous LQ, valeur brute sinon.
+    composantes = [
+        Mesure(valeur=0.05, sous_lq=True, date_prelevement=date(2026, 6, 15)),   # -> 0.025
+        Mesure(valeur=0.08, sous_lq=False, date_prelevement=date(2026, 6, 15)),  # -> 0.08
+    ]
+    resultat = valeur_somme_reglementaire(None, composantes)
+    assert resultat is not None
+    assert abs(resultat - 0.105) < 1e-9
+
+
+def test_somme_reglementaire_total_sous_lq_retombe_sur_composantes():
+    total = Mesure(valeur=0.5, sous_lq=True, date_prelevement=date(2026, 6, 15))
+    composantes = [Mesure(valeur=0.05, sous_lq=True, date_prelevement=date(2026, 6, 15))]
+    resultat = valeur_somme_reglementaire(total, composantes)
+    assert abs(resultat - 0.025) < 1e-9
+
+
+def test_somme_reglementaire_aucune_donnee():
+    assert valeur_somme_reglementaire(None, []) is None
