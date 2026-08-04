@@ -66,3 +66,68 @@ def score_nitrates_securite(nitrates: float, nitrites: float) -> float:
 def score_securite(p_bact: float, p_pest: float, p_pfas: float, p_metaux: float, p_nitrates: float) -> float:
     """§3.1.1 S_sécurité = min(P_bact, P_pest, P_pfas, P_métaux, P_nitrates)."""
     return min(p_bact, p_pest, p_pfas, p_metaux, p_nitrates)
+
+
+def score_nitrates_mineraux(valeur: float) -> float:
+    """§3.1.2 N_nitrates (gustatif/confort — distinct de P_nitrates en §3.1.1)."""
+    if valeur < 10:
+        return 100.0
+    if valeur < 25:
+        return 85.0
+    if valeur < 40:
+        return 65.0
+    if valeur <= 50:
+        return 40.0
+    return 0.0
+
+
+def score_chlorures(valeur: float) -> float:
+    """§3.1.2 N_chlorures."""
+    if valeur <= 100:
+        return 100.0
+    if valeur <= 200:
+        return 100.0 - (valeur - 100) / 100.0 * 60.0
+    return max(0.0, 40.0 * 200.0 / valeur)
+
+
+def score_sulfates(valeur: float) -> float:
+    """§3.1.2 N_sulfates."""
+    if valeur <= 150:
+        return 100.0
+    if valeur <= 250:
+        return 100.0 - (valeur - 150) / 100.0 * 60.0
+    return max(0.0, 40.0 * 250.0 / valeur)
+
+
+def score_mineraux(nitrates: float, chlorures: float, sulfates: float) -> float:
+    """§3.1.2 S_mineraux = 0.70*N_nitrates + 0.15*N_chlorures + 0.15*N_sulfates."""
+    return (0.70 * score_nitrates_mineraux(nitrates)
+            + 0.15 * score_chlorures(chlorures)
+            + 0.15 * score_sulfates(sulfates))
+
+
+def score_chlore_gout(valeur: float) -> float:
+    """§3.1.3 N_chlore."""
+    if valeur < 0.05:
+        return 100.0
+    if valeur <= 0.15:
+        return 80.0
+    if valeur <= 0.30:
+        return 50.0
+    return 20.0
+
+
+def score_turbidite(valeur: float) -> float:
+    """§3.1.3 N_turbidite."""
+    if valeur < 0.3:
+        return 100.0
+    if valeur <= 1.0:
+        return 80.0
+    if valeur <= 2.0:
+        return 55.0
+    return 30.0
+
+
+def score_gout(chlore: float, turbidite: float) -> float:
+    """§3.1.3 S_gout = 0.60*N_chlore + 0.40*N_turbidite."""
+    return 0.60 * score_chlore_gout(chlore) + 0.40 * score_turbidite(turbidite)
