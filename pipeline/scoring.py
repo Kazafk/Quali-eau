@@ -159,3 +159,76 @@ def score_boisson(s_securite: float, s_mineraux: float, s_gout: float, veto: boo
     if veto:
         brut = min(brut, s_securite_r)
     return arrondi(max(0.0, min(100.0, brut)))
+
+
+def score_durete(th: float) -> float:
+    """§3.2.1 S_durete — par paliers en dessous de 15 °fH, continue au-delà
+    (correction de formulation v1.3 : la fonction n'est PAS continue en
+    dessous de 15 °fH, contrairement à ce qu'affirmait la v1.1/v1.2)."""
+    if th < 3:
+        return 85.0
+    if th < 8:
+        return 90.0
+    if th <= 15:
+        return 100.0
+    if th <= 25:
+        return 100.0 - 2.5 * (th - 15)
+    if th <= 35:
+        return 75.0 - 3.0 * (th - 25)
+    return max(0.0, 45.0 - 3.0 * (th - 35))
+
+
+def score_chlore_cosmetique(valeur: float) -> float:
+    """§3.2.2 S_chlore (chlore total 1399, même barème que N_chlore boisson)."""
+    if valeur <= 0.05:
+        return 100.0
+    if valeur <= 0.15:
+        return 80.0
+    if valeur <= 0.30:
+        return 50.0
+    return 20.0
+
+
+def score_ph(ph: float) -> float:
+    """§3.2.3 S_pH."""
+    if 6.8 <= ph <= 7.4:
+        return 100.0
+    if 6.5 <= ph < 6.8:
+        return 85.0
+    if 7.4 < ph <= 7.8:
+        return 80.0
+    if 7.8 < ph <= 8.2:
+        return 55.0
+    return 25.0
+
+
+def score_cuivre(valeur: float) -> float:
+    """§3.2.4 N_Cu."""
+    if valeur < 0.1:
+        return 100.0
+    if valeur <= 0.5:
+        return 100.0 - (valeur - 0.1) / 0.4 * 50.0
+    return 30.0
+
+
+def score_fer(valeur: float) -> float:
+    """§3.2.4 N_Fe."""
+    if valeur < 50:
+        return 100.0
+    if valeur <= 200:
+        return 100.0 - (valeur - 50) / 150.0 * 60.0
+    return 20.0
+
+
+def score_manganese(valeur: float) -> float:
+    """§3.2.4 N_Mn."""
+    if valeur < 10:
+        return 100.0
+    if valeur <= 50:
+        return 100.0 - (valeur - 10) / 40.0 * 60.0
+    return 20.0
+
+
+def score_metaux_depots(cu: float, fe: float, mn: float) -> float:
+    """§3.2.4 S_metaux_depots = min(N_Cu, N_Fe, N_Mn)."""
+    return min(score_cuivre(cu), score_fer(fe), score_manganese(mn))
