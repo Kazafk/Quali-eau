@@ -131,3 +131,31 @@ def score_turbidite(valeur: float) -> float:
 def score_gout(chlore: float, turbidite: float) -> float:
     """§3.1.3 S_gout = 0.60*N_chlore + 0.40*N_turbidite."""
     return 0.60 * score_chlore_gout(chlore) + 0.40 * score_turbidite(turbidite)
+
+
+def veto_sanitaire(bact_actif: bool, nitrates: float, nitrites: float,
+                    pb: float, as_: float, cd: float,
+                    pesticide_molecule_max: float, pesticide_total: float,
+                    pfas: float) -> bool:
+    """§3.1 — conditions de veto sanitaire (facteur limitant)."""
+    return (
+        bact_actif
+        or nitrates > 50 or nitrites > 0.1
+        or pb > 10 or as_ > 10 or cd > 5
+        or pesticide_molecule_max > 0.1 or pesticide_total > 0.5
+        or pfas > 0.1
+    )
+
+
+def score_boisson(s_securite: float, s_mineraux: float, s_gout: float, veto: bool) -> int:
+    """§3.1 S_boisson = 0.55*S_securite + 0.25*S_mineraux + 0.20*S_gout,
+    plafonné à S_securite en cas de veto sanitaire (correctif v1.3 : ce
+    plafond n'a d'effet réel que parce que P_nitrates fait maintenant
+    partie de S_securite, cf. score_nitrates_securite)."""
+    s_securite_r = arrondi(s_securite)
+    s_mineraux_r = arrondi(s_mineraux)
+    s_gout_r = arrondi(s_gout)
+    brut = 0.55 * s_securite_r + 0.25 * s_mineraux_r + 0.20 * s_gout_r
+    if veto:
+        brut = min(brut, s_securite_r)
+    return arrondi(max(0.0, min(100.0, brut)))
