@@ -29,32 +29,13 @@
 
 ## 🌟 Vision & Objectifs
 
-En France, l'eau du robinet est l'aliment le plus surveillé, mais les données brutes d'analyses sanitaires restent complexes et éparpillées. **Quali'eau** traduit automatiquement ces millions de mesures brutes en indicateurs simples et actionnables :
+En France, l'eau du robinet est l'aliment le plus surveillé, mais les données brutes d'analyses sanitaires restent complexes et éparpillées. **Quali'eau** traduit automatiquement ces millions de mesures brutes en indicateurs simples et actionnables.
 
-```
-                      ┌────────────────────────────────────────┐
-                      │   SISE-EAUX / data.gouv (exports DIS)  │
-                      │  - Prélèvements & résultats d'analyses │
-                      │  - Conclusions sanitaires ARS          │
-                      └──────────────────┬─────────────────────┘
-                                         │ batch hebdomadaire
-                                         ▼
-                      ┌────────────────────────────────────────┐
-                      │       Moteur de Calcul Quali'eau       │
-                      │   - Agrégation temporelle & spatiale   │
-                      │   - Normalisation & seuils sanitaires  │
-                      └──────────────┬──────────────────┬──────┘
-                                     │                  │
-                ┌────────────────────┴─────┐      ┌─────┴────────────────────┐
-                │                          │      │                          │
-                ▼                          ▼      ▼                          ▼
-   ┌──────────────────────────┐               ┌──────────────────────────┐
-   │    SCORE BOISSON (🥤)     │               │ SCORE COSMÉTIQUE/LAVAGE (🧴)│
-   │  - Sécurité Sanitaire    │               │  - Calcaire & Dureté TH  │
-   │  - Minéralité & Équilibre│               │  - Chlore & Irritation   │
-   │  - Profil Goût & Saveur  │               │  - Respect pH Cutané     │
-   │  - Indice Café/Thé (SCA) │               │  - Métaux & Dépôts       │
-   └──────────────────────────┘               └──────────────────────────┘
+```mermaid
+flowchart TD
+    A["<b>SISE-EAUX / data.gouv.fr</b><br/>• Prélèvements & résultats DIS<br/>• Conclusions sanitaires ARS"] -->|batch hebdomadaire| B["<b>Moteur de Calcul Quali'eau</b><br/>• Agrégation temporelle & spatiale<br/>• Normalisation & seuils sanitaires"]
+    B --> C["🥤 <b>SCORE BOISSON</b><br/>• Sécurité Sanitaire<br/>• Minéraux & Équilibre<br/>• Profil Goût & Saveur<br/>• Indice Café/Thé (SCA)"]
+    B --> D["🧴 <b>SCORE COSMÉTIQUE / LAVAGE</b><br/>• Calcaire & Dureté TH<br/>• Chlore & Irritation<br/>• Respect pH Cutané<br/>• Métaux & Dépôts"]
 ```
 
 ---
@@ -75,47 +56,63 @@ Les deux scores sont exprimés sur une échelle de **0 à 100** avec attribution
 
 ### 🥤 Usage 1 : Boisson & Santé
 
-Formule globale :
-$$\text{Score Boisson} = 0,55 \cdot S_{\text{sécurité}} + 0,25 \cdot S_{\text{minéraux}} + 0,20 \cdot S_{\text{goût}}$$
+#### Formule globale :
+
+$$S_{\text{boisson}} = 0{,}55 \cdot S_{\text{securite}} + 0{,}25 \cdot S_{\text{mineraux}} + 0{,}20 \cdot S_{\text{gout}}$$
 
 #### 🛡️ Veto Sanitaire (Facteur limitant)
+
 En cas de dépassement sanitaire grave, le score global est immédiatement plafonné :
-$$\text{Score Boisson} = \min(\text{Score Boisson}, S_{\text{sécurité}})$$
+
+$$S_{\text{boisson}} = \min(S_{\text{boisson}}, S_{\text{securite}})$$
 
 Sont concernés par le veto :
 - Non-conformité bactériologique active (ex. *E. coli*, Entérocoques)
 - Nitrates > 50 mg/L ou Nitrites > 0,1 mg/L
-- Métaux lourd hors normes (Plomb > 10 µg/L, Arsenic > 10 µg/L, Cadmium > 5 µg/L)
+- Métaux lourds hors normes (Plomb > 10 µg/L, Arsenic > 10 µg/L, Cadmium > 5 µg/L)
 - Dépassement de pesticides (molécule individuelle > 0,1 µg/L ou total > 0,5 µg/L)
 - Dépassement de PFAS (somme des 20 PFAS > 0,1 µg/L)
 
 #### Composition des Sous-Scores Boisson :
-1. **Sécurité Sanitaire ($S_{\text{sécurité}}$)** : $\min(P_{\text{bact}}, P_{\text{pest}}, P_{\text{pfas}}, P_{\text{métaux}}, P_{\text{nitrates}})$
-2. **Minéraux & Équilibre ($S_{\text{minéraux}}$)** : $70\% \text{ Nitrates} + 15\% \text{ Chlorures} + 15\% \text{ Sulfates}$
-3. **Profil Gustatif ($S_{\text{goût}}$)** : $60\% \text{ Chlore libre} + 40\% \text{ Turbidité}$
+
+1. **Sécurité Sanitaire** ($S_{\text{securite}}$) :
+
+   $$S_{\text{securite}} = \min(P_{\text{bact}}, P_{\text{pest}}, P_{\text{pfas}}, P_{\text{metaux}}, P_{\text{nitrates}})$$
+
+2. **Minéraux & Équilibre** ($S_{\text{mineraux}}$) :
+
+   $$S_{\text{mineraux}} = 0{,}70 \cdot N_{\text{nitrates}} + 0{,}15 \cdot N_{\text{chlorures}} + 0{,}15 \cdot N_{\text{sulfates}}$$
+
+3. **Profil Gustatif** ($S_{\text{gout}}$) :
+
+   $$S_{\text{gout}} = 0{,}60 \cdot N_{\text{chlore}} + 0{,}40 \cdot N_{\text{turbidite}}$$
 
 ---
 
 ### 🧴 Usage 2 : Cosmétique, Peau & Lavage
 
-Formule globale :
-$$\text{Score Cosmétique} = 0,45 \cdot S_{\text{dureté}} + 0,25 \cdot S_{\text{chlore}} + 0,15 \cdot S_{\text{pH}} + 0,15 \cdot S_{\text{métaux\_dépôts}}$$
+#### Formule globale :
+
+$$S_{\text{cosmetique}} = 0{,}45 \cdot S_{\text{durete}} + 0{,}25 \cdot S_{\text{chlore}} + 0{,}15 \cdot S_{\text{pH}} + 0{,}15 \cdot S_{\text{metaux\_depots}}$$
 
 #### Composition des Sous-Scores Cosmétique :
-1. **Dureté & Calcaire ($S_{\text{dureté}}$)** : basé sur le Titre Hydrotimétrique (TH en °fH).
+
+1. **Dureté & Calcaire** ($S_{\text{durete}}$) : basé sur le Titre Hydrotimétrique (TH en °fH).
    - *3 à 8 °fH* : Idéal pour la peau (Score 90–100)
    - *15 à 25 °fH* : Eau moyennement dure (Score 75–100)
    - *> 35 °fH* : Eau très dure (dessèchement cutané, tartre, surconsommation de savon)
-2. **Chlore & Agressivité ($S_{\text{chlore}}$)** : évaluation de l'évaporation du chlore sous la douche et de l'oxydation de la kératine/film hydrolipidique.
-3. **Respect Cutané ($S_{\text{pH}}$)** : adéquation avec le pH physiologique de la peau (~4,7–5,5). Plage idéale de l'eau : 6,8–7,4.
-4. **Métaux & Dépôts ($S_{\text{métaux\_dépôts}}$)** : $\min(\text{Cuivre}, \text{Fer}, \text{Manganèse})$ pour éviter les taches sur le linge et l'altération des cheveux.
+2. **Chlore & Agressivité** ($S_{\text{chlore}}$) : évaluation de l'évaporation du chlore sous la douche et de l'oxydation de la kératine/film hydrolipidique.
+3. **Respect Cutané** ($S_{\text{pH}}$) : adéquation avec le pH physiologique de la peau (~4,7–5,5). Plage idéale de l'eau : 6,8–7,4.
+4. **Métaux & Dépôts** ($S_{\text{metaux\_depots}}$) :
+
+   $$S_{\text{metaux\_depots}} = \min(N_{\text{Cu}}, N_{\text{Fe}}, N_{\text{Mn}})$$
 
 ---
 
 ### ☕ Indice Spécialisé Café / Thé (SCA Standard)
 
 En complément, Quali'eau fournit un **Coffee & Tea Index** calculé selon les standards de la *Specialty Coffee Association* :
-- **TDS estimé** : Cible ~150 mg/L ($0,65 \times \text{Conductivité}$)
+- **TDS estimé** : Cible ~150 mg/L ($0{,}65 \times \text{Conductivite}$)
 - **Dureté calcique (GH)** : Cible ~68 mg/L $\text{CaCO}_3$ (~6,8 °fH)
 - **Alcalinité totale (TAC / KH)** : Cible ~40 mg/L $\text{CaCO}_3$ (~4,0 °fH)
 - **Chlore total** : Cible 0 mg/L
@@ -127,14 +124,14 @@ En complément, Quali'eau fournit un **Coffee & Tea Index** calculé selon les s
 Pour chaque problème détecté (eau calcaire, chlore, polluants), des recommandations personnalisées et impartiales sont générées avec une **estimation budgétaire par palier technologique** (CAPEX/OPEX) :
 
 ### Dureté & Calcaire (Adoucisseurs / Douche)
-- **15–25 °fH** : Adoucisseur standard 10–15 L (~700€–900€ | ~15€/an)
-- **25–40 °fH** : Adoucisseur renforcé 20–25 L (~1200€–1600€ | ~50€–70€/an)
-- **> 40 °fH** : Adoucisseur haute capacité > 25 L (~1600€–2000€ | ~70€–100€/an)
+- **15–25 °fH** : Adoucisseur standard 10–15 L (~700 € – 900 € | ~15 €/an)
+- **25–40 °fH** : Adoucisseur reinforced 20–25 L (~1 200 € – 1 600 € | ~50 € – 70 €/an)
+- **> 40 °fH** : Adoucisseur haute capacité > 25 L (~1 600 € – 2 000 € | ~70 € – 100 €/an)
 
 ### Polluants Chimiques (Filtration Eau de Boisson)
-- **Dépassement modéré** : Filtre sous-évier à charbon actif (~80€–120€ | ~30€/an)
-- **Dépassement élevé** : Osmoseur inverse 3 étages (~200€–300€ | ~60€/an)
-- **Dépassement extrême (veto)** : Osmoseur à pompe de perméat + reminéralisation (~450€–700€ | ~90€/an)
+- **Dépassement modéré** : Filtre sous-évier à charbon actif (~80 € – 120 € | ~30 €/an)
+- **Dépassement élevé** : Osmoseur inverse 3 étages (~200 € – 300 € | ~60 €/an)
+- **Dépassement extrême (veto)** : Osmoseur à pompe de perméat + reminéralisation (~450 € – 700 € | ~90 €/an)
 
 ---
 
@@ -142,21 +139,22 @@ Pour chaque problème détecté (eau calcaire, chlore, polluants), des recommand
 
 Le projet adopte une **architecture 100 % statique hébergée sur GitHub Pages**, garantissant zéro coût d'hébergement et des performances optimales.
 
-```
-┌──────────────── GitHub Actions — cron hebdo (lundi, 6h UTC) ──────────────────┐
-│  1. pipeline/download_data.py   → Téléchargement ZIPs DIS (data.gouv.fr)        │
-│  2. pipeline/compute_scores.py  → Parsing TXT, agrégation & calcul des scores  │
-│                                   └→ Génération des fichiers JSON dans public/  │
-│  3. peaceiris/actions-gh-pages  → Publication automatique sur GitHub Pages     │
-└───────────────────────────────────────────┬───────────────────────────────────┘
-                                            │ push gh-pages
-┌───────────────────────────────────────────▼───────────────────────────────────┐
-│                          HÉBERGEMENT GITHUB PAGES                             │
-│  index.html · map.js · panel.js · style.css  (Vanilla JS + MapLibre GL)       │
-│  - data/national.geojson                 (Carte nationale allégée)            │
-│  - data/index.json                        (Métadonnées & statistiques)        │
-│  - data/communes/{code_insee}.json        (Fiches communales lazy-loaded)     │
-└───────────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph GitHub_Actions ["GitHub Actions (cron hebdo : lundi 6h UTC)"]
+        direction TB
+        G1["1. download_data.py<br/><i>Téléchargement ZIPs DIS data.gouv</i>"] --> G2["2. compute_scores.py<br/><i>Parsing TXT, agrégation & scoring</i>"]
+        G2 --> G3["3. actions-gh-pages<br/><i>Publication statique sur branch gh-pages</i>"]
+    end
+
+    subgraph GitHub_Pages ["Hébergement GitHub Pages (CDN)"]
+        direction TB
+        P1["<b>index.html / map.js / panel.js / style.css</b><br/><i>Vanilla JS + MapLibre GL</i>"]
+        P2["<b>data/national.geojson</b><br/><i>Carte nationale allégée</i>"]
+        P3["<b>data/communes/{code}.json</b><br/><i>~35 000 fiches lazy-loaded</i>"]
+    end
+
+    GitHub_Actions -->|Deploy| GitHub_Pages
 ```
 
 ---
@@ -193,7 +191,7 @@ Quali'eau/
 ### Prérequis
 
 - **Python 3.12+**
-- **Node.js / npm** (optionnel, uniquement pour un serveur de dev local type `http-server` ou `serve`)
+- **Node.js / npm** (optionnel, pour un serveur local de dev type `serve` ou `http-server`)
 - **Git**
 
 ### Exécution du Pipeline de Données
@@ -221,7 +219,7 @@ Pour tester le site en local, vous pouvez utiliser le serveur HTTP natif de Pyth
 # Se placer dans le dossier public
 cd public
 
-# Lancer le serveur local sur le port 8000
+# Lancement du serveur HTTP local sur le port 8000
 python -m http.server 8000
 ```
 
