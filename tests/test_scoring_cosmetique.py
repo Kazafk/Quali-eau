@@ -6,6 +6,7 @@ from pipeline.scoring import (
     score_fer,
     score_manganese,
     score_metaux_depots,
+    score_cosmetique,
 )
 
 
@@ -68,3 +69,10 @@ def test_manganese_bandes():
 
 def test_metaux_depots_est_le_minimum():
     assert abs(score_metaux_depots(cu=0.08, fe=62.5, mn=5.0) - 95.0) < 1e-6
+
+
+def test_score_cosmetique_exemple_spec_paris():
+    # Reprend l'exemple de la fiche communale (§5.3) :
+    # durete=59 (arrondi de 59.43), chlore=80, pH=100, metaux_depots=95 -> 76
+    resultat = score_cosmetique(th=30.19, chlore_total=0.12, ph=7.0, cu=0.08, fe=62.5, mn=5.0)
+    assert resultat == 76

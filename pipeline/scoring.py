@@ -232,3 +232,14 @@ def score_manganese(valeur: float) -> float:
 def score_metaux_depots(cu: float, fe: float, mn: float) -> float:
     """§3.2.4 S_metaux_depots = min(N_Cu, N_Fe, N_Mn)."""
     return min(score_cuivre(cu), score_fer(fe), score_manganese(mn))
+
+
+def score_cosmetique(th: float, chlore_total: float, ph: float, cu: float, fe: float, mn: float) -> int:
+    """§3.2 S_cosmetique = 0.45*S_durete + 0.25*S_chlore + 0.15*S_pH + 0.15*S_metaux_depots.
+    Les sous-scores sont arrondis avant combinaison (convention de l'exemple §5.3)."""
+    s_durete = arrondi(score_durete(th))
+    s_chlore = arrondi(score_chlore_cosmetique(chlore_total))
+    s_ph = arrondi(score_ph(ph))
+    s_metaux = arrondi(score_metaux_depots(cu, fe, mn))
+    brut = 0.45 * s_durete + 0.25 * s_chlore + 0.15 * s_ph + 0.15 * s_metaux
+    return arrondi(max(0.0, min(100.0, brut)))
