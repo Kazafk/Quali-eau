@@ -82,6 +82,15 @@ METAUX_LQ = {
     "1386": 20.0,  # Nickel, µg/L
 }
 
+# Seuls ces codes SANDRE alimentent calculer_fiche_commune — filtrer dès
+# l'accumulation évite de charger ~200 codes jamais utilisés en mémoire
+# pour chaque commune (limitation mémoire notée lors de la revue finale
+# du plan précédent).
+CODES_CONSOMMES = set(PESTICIDE_CODES) | set(METAUX_LQ) | {
+    "6276", "8847", "1340", "1339", "1337", "1338", "1398", "1295",
+    "1345", "1399", "1302", "1392", "1393", "1394",
+}
+
 
 def _moyenne_ou_zero(mesures: list, date_reference: date) -> float:
     if not mesures:
@@ -312,20 +321,24 @@ def calculer_fiche_commune(code_insee: str, mesures_par_parametre: dict,
     }
 
 
-from pipeline.dis_parser import load_prelevements, load_udi_reseaux, iter_mesures
+from pipeline.dis_parser import (
+    load_prelevements, load_udi_reseaux, iter_mesures,
+    charger_prelevements_multi, iter_mesures_multi,
+)
 
 
-def construire_fiches(plv_path: str, result_path: str, udi_path: str, date_reference: date) -> dict:
-    """Charge PLV+RESULT+UDI et construit la fiche de chaque commune connue.
-    Le réseau principal (§2.5.4) n'est pas encore filtré ici : toutes les
-    mesures de toutes les communes du fichier sont agrégées ensemble (une
-    commune multi-réseaux verra ses réseaux fusionnés — affinage laissé à
-    un futur plan si un cas réel l'exige)."""
-    prelevements = load_prelevements(plv_path)
-    _reseaux_par_commune = load_udi_reseaux(udi_path)  # réservé pour affinage futur
+def construire_fiches(plv_paths: list[str], result_paths: list[str], udi_path: str, date_reference: date) -> dict:
+    """Charge PLV+RESULT (fusionnés sur plusieurs années, §2.1) + UDI
+    (référentiel réseau, une seule année — la plus récente) et construit
+    la fiche de CHAQUE commune connue, y compris celles sans aucune mesure
+    (§2.5.6 : fiche "indisponible", jamais une absence silencieuse)."""
+    prelevements = charger_prelevements_multi(plv_paths)
+    reseaux_par_commune = load_udi_reseaux(udi_path)
 
     mesures_par_commune: dict = {}
-    for code_insee, code_parametre, mesure in iter_mesures(result_path, prelevements):
+    for code_insee, code_parametre, mesure in iter_mesures_multi(result_paths, prelevements):
+        if code_parametre not in CODES_CONSOMMES:
+            continue
         mesures_par_commune.setdefault(code_insee, {}).setdefault(code_parametre, []).append(mesure)
 
     historique_bacterio_par_commune: dict = {}
@@ -336,8 +349,15 @@ def construire_fiches(plv_path: str, result_path: str, udi_path: str, date_refer
             ConclusionBacterio(date_prelevement=info.date_prelevement, conforme=info.conforme_bacterio)
         )
 
+    codes_connus = (
+        set(mesures_par_commune)
+        | set(reseaux_par_commune)
+        | {info.code_insee for info in prelevements.values()}
+    )
+
     fiches = {}
-    for code_insee, mesures_par_parametre in mesures_par_commune.items():
+    for code_insee in codes_connus:
+        mesures_par_parametre = mesures_par_commune.get(code_insee, {})
         historique = historique_bacterio_par_commune.get(code_insee, [])
         fiches[code_insee] = calculer_fiche_commune(code_insee, mesures_par_parametre, historique, date_reference)
     return fiches
@@ -363,7 +383,7 @@ def main(raw_dir: str, output_dir: str, date_reference: date | None = None) -> N
     result_path = _trouver_fichier(raw_dir, "DIS_RESULT*.txt")
     udi_path = _trouver_fichier(raw_dir, "DIS_COM_UDI*.txt")
 
-    fiches = construire_fiches(plv_path, result_path, udi_path, date_reference)
+    fiches = construire_fiches([plv_path], [result_path], udi_path, date_reference)
 
     communes_dir = os.path.join(output_dir, "communes")
     os.makedirs(communes_dir, exist_ok=True)

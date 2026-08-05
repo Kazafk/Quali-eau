@@ -160,8 +160,8 @@ def test_construire_fiches_depuis_fixtures_reelles():
     # Bout-en-bout : PLV + RESULT + UDI (fixtures Tasks 3-5) -> fiches multi-communes
     date_ref = date(2026, 8, 5)
     fiches = construire_fiches(
-        plv_path=os.path.join(FIXTURES_DIR, "DIS_PLV_sample.txt"),
-        result_path=os.path.join(FIXTURES_DIR, "DIS_RESULT_sample.txt"),
+        plv_paths=[os.path.join(FIXTURES_DIR, "DIS_PLV_sample.txt")],
+        result_paths=[os.path.join(FIXTURES_DIR, "DIS_RESULT_sample.txt")],
         udi_path=os.path.join(FIXTURES_DIR, "DIS_COM_UDI_sample.txt"),
         date_reference=date_ref,
     )
@@ -179,8 +179,8 @@ def test_construire_fiches_bacterio_resolue_via_paris_plm():
     # pas "conforme" (100).
     date_ref = date(2026, 8, 5)
     fiches = construire_fiches(
-        plv_path=os.path.join(FIXTURES_DIR, "DIS_PLV_sample.txt"),
-        result_path=os.path.join(FIXTURES_DIR, "DIS_RESULT_sample.txt"),
+        plv_paths=[os.path.join(FIXTURES_DIR, "DIS_PLV_sample.txt")],
+        result_paths=[os.path.join(FIXTURES_DIR, "DIS_RESULT_sample.txt")],
         udi_path=os.path.join(FIXTURES_DIR, "DIS_COM_UDI_sample.txt"),
         date_reference=date_ref,
     )
@@ -214,6 +214,22 @@ def test_calculer_fiche_commune_cosmetique_sans_aucune_donnee_est_null():
     assert fiche["scores"]["cosmetique"]["score"] is None
     assert fiche["scores"]["cosmetique"]["sous_scores"]["durete_calcaire"] is None
     assert fiche["scores"]["donnees_partielles"] is True
+
+
+def test_construire_fiches_commune_sans_mesure_recoit_fiche_indisponible():
+    # §2.5.6 : une commune connue via le référentiel réseau (DIS_COM_UDI)
+    # mais sans aucune mesure doit recevoir une fiche "indisponible",
+    # pas être silencieusement absente du résultat.
+    date_ref = date(2026, 8, 5)
+    fiches = construire_fiches(
+        plv_paths=[os.path.join(FIXTURES_DIR, "DIS_PLV_sample.txt")],
+        result_paths=[os.path.join(FIXTURES_DIR, "DIS_RESULT_sample.txt")],
+        udi_path=os.path.join(FIXTURES_DIR, "DIS_COM_UDI_sample.txt"),
+        date_reference=date_ref,
+    )
+    assert "99999" in fiches
+    assert fiches["99999"]["statut_donnees"] == "indisponible"
+    assert fiches["99999"]["scores"] is None
 
 
 def test_trouver_fichier_resout_nom_suffixe_annee(tmp_path):
