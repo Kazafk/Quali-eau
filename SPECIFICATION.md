@@ -1,6 +1,6 @@
 # Spécification Technique & Fonctionnelle — Quali'eau
 
-> **Version :** 1.3.0 (correctifs veto sanitaire nitrates/nitrites + module d'estimation budgétaire des équipements — 04/08/2026)
+> **Version :** 1.4.0 (format réel des fichiers DIS vérifié sur données réelles — 05/08/2026)
 > **Statut :** En cours de cadrage — spécification de référence
 > **Projet :** Quali'eau (même squelette technique que *SCA Water Map* et *Pesticides Water Map*)
 > **Sources de données :** Exports data.gouv.fr du contrôle sanitaire SISE-EAUX (batch hebdomadaire) ; API Hub'eau *Qualité de l'eau potable* (développement & tests)
@@ -53,11 +53,18 @@ Les deux projets précurseurs ont démontré deux besoins complémentaires :
 
 Comme *Pesticides Water Map*, l'intake de production repose sur les exports officiels du Ministère de la Santé publiés sur data.gouv.fr : [*Résultats du contrôle sanitaire de l'eau distribuée commune par commune*](https://www.data.gouv.fr/fr/datasets/resultats-du-controle-sanitaire-de-leau-distribuee-commune-par-commune/) — mise à jour **hebdomadaire (lundi)**, ce qui fixe la cadence de rafraîchissement du site.
 
-Format réel des fichiers (vérifié sur dis-2026 par le projet précurseur) :
-* Un ZIP par année (~900 Mo au total pour 4 années) contenant 3 fichiers `.txt`, séparateur virgule, encodage UTF-8.
-* `DIS_PLV_*.txt` : prélèvements — `referenceprel`, `inseecommuneprinc`, `dateprel`, `cdreseau`, conclusions de conformité.
-* `DIS_RESULT_*.txt` : résultats — `referenceprel`, `cdparametre`, `valtraduite`, limite/référence de qualité.
-* **Jointure** entre les deux via `referenceprel`.
+Format réel des fichiers (vérifié le 05/08/2026 directement sur `dis-2026.zip` téléchargé par le projet précurseur *Pesticides Water Map*, 97 872 prélèvements / 3,8 M résultats pour la seule année 2026) :
+* Un ZIP par année (~900 Mo au total pour 4 années) contenant **3 fichiers `.txt`**, séparateur virgule, encodage UTF-8, champs entre guillemets.
+* **`DIS_PLV_*.txt`** (prélèvements) — colonnes réelles : `cddept, cdreseau, inseecommuneprinc, nomcommuneprinc, cdreseauamont, nomreseauamont, pourcentdebit, referenceprel, dateprel, heureprel, conclusionprel, ugelib, distrlib, moalib, plvconformitebacterio, plvconformitechimique, plvconformitereferencebact, plvconformitereferencechim`. Les 4 champs de conformité valent `C`/`N` (équivalents batch des champs API `conformite_limites_bact_prelevement` etc. de l'§2.2 — noms différents, même sémantique).
+* **`DIS_RESULT_*.txt`** (résultats) — colonnes réelles : `cddept, referenceprel, cdparametresiseeaux, cdparametre, libmajparametre, libminparametre, libwebparametre, qualitparam, insituana, rqana, cdunitereferencesiseeaux, cdunitereference, limitequal, refqual, valtraduite, casparam, referenceanl`.
+* **`DIS_COM_UDI_*.txt`** (référentiel commune ↔ réseau, non exploité par *Pesticides Water Map* mais nécessaire ici pour §2.5.4) — colonnes réelles : `inseecommune, nomcommune, quartier, cdreseau, nomreseau, debutalim`.
+* **Jointure** `DIS_PLV` ↔ `DIS_RESULT` via `referenceprel`.
+
+> **Piège vérifié sur données réelles — lecture de la limite de quantification (LQ) :** contrairement à l'API Hub'eau (§2.2, où `resultat_numerique` porte la valeur de LQ quand le résultat est sous LQ), dans les fichiers batch **`valtraduite` vaut `0.000000` pour toute ligne sous LQ**, quel que soit le paramètre — vérifié sur 4 codes distincts (nitrites `1339`, PFAS `8847`, plomb `1382`, glyphosate `1506`), toujours avec le même motif :
+> ```
+> "1382","PLOMB",...,"rqana"="<2","limitequal"="<=10 µg/L",...,"valtraduite"="0.000000"
+> ```
+> La valeur de LQ réelle (ici `2`) et le signe `<` sont **uniquement** dans `rqana` (chaîne, séparateur décimal **virgule** — `"<0,020"`, `"<0,01"` — à convertir en point avant `float()`). Le moteur d'ingestion doit donc détecter le dépassement/sous-LQ et extraire la valeur de LQ depuis `rqana` (`str.startswith("<")` puis remplacement `,`→`.`), **jamais** depuis `valtraduite` seul — l'utiliser naïvement zérairait à tort les substitutions LQ/2 de §2.5.3. Quand `rqana` ne commence pas par `<` (résultat quantifié), `valtraduite` porte la même valeur que `rqana` (converti en point), les deux sont alors interchangeables.
 
 Années retenues : glissantes, couvrant ≥ 24 mois (fenêtre de calcul §2.3).
 
@@ -689,6 +696,11 @@ def estimate_cost(param_code: str, value: float) -> dict | None:
 ---
 
 ## 9. Changelog
+
+### v1.4.0 — 05/08/2026 (format réel des fichiers DIS)
+* **§2.1 corrigée avec les vrais noms de colonnes** des fichiers `DIS_PLV`/`DIS_RESULT`/`DIS_COM_UDI`, vérifiés directement sur `dis-2026.zip` (téléchargé par *Pesticides Water Map*) plutôt que déduits des noms de champs de l'API Hub'eau — les deux diffèrent (ex. `plvconformitebacterio` dans le batch vs `conformite_limites_bact_prelevement` dans l'API).
+* **Piège LQ documenté** : dans les fichiers batch, `valtraduite` vaut `0.000000` pour toute ligne sous LQ (vérifié sur 4 codes distincts) — la valeur de LQ et le signe `<` ne sont disponibles que dans `rqana` (décimales en virgule). Sans cette correction, une implémentation naïve du pipeline d'ingestion aurait silencieusement cassé la règle LQ/2 de §2.5.3 en lisant `valtraduite`.
+* Ajout de `DIS_COM_UDI_*.txt` (référentiel commune↔réseau) à la description du format, nécessaire à la gestion multi-UDI (§2.5.4) mais non utilisé par le projet précurseur.
 
 ### v1.3.0 — 04/08/2026 (correctifs scoring + module de coûts)
 * **Correction du bug critique du veto nitrates/nitrites** : `S_sécurité` intègre désormais un terme `P_nitrates` dédié (nitrates `1340` ≤ 50 mg/L, nitrites `1339` ≤ 0,1 mg/L, sinon pénalité `50 × seuil/valeur`) ; le veto sanitaire `min(S_boisson, S_sécurité)` était jusqu'ici sans effet sur les dépassements de nitrates/nitrites, ces paramètres étant absents de `S_sécurité`.
