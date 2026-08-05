@@ -37,3 +37,14 @@ def evaluer_bacteriologie(historique: list) -> tuple[bool, bool]:
         return False, False
     y_a_eu_non_conformite = any(not c.conforme for c in historique_trie[:-1])
     return True, y_a_eu_non_conformite
+
+
+def choisir_reseau_principal(reseaux: list, nb_prelevements_par_reseau: dict) -> str | None:
+    """§2.5.4 — retourne le code du réseau ayant le plus de prélèvements
+    récents parmi ceux desservant la commune. None si aucun réseau connu."""
+    if not reseaux:
+        return None
+    return max(
+        (r.code_reseau for r in reseaux),
+        key=lambda code: nb_prelevements_par_reseau.get(code, 0),
+    )

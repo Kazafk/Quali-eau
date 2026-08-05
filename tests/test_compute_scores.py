@@ -57,3 +57,28 @@ def test_evaluer_bacteriologie_aucun_historique():
     conforme_dernier, resolu = evaluer_bacteriologie([])
     assert conforme_dernier is True
     assert resolu is False
+
+
+from pipeline.dis_parser import ReseauRef
+from pipeline.compute_scores import choisir_reseau_principal
+
+
+def test_choisir_reseau_principal_le_plus_de_prelevements():
+    reseaux = [ReseauRef("R1", "Réseau 1"), ReseauRef("R2", "Réseau 2")]
+    nb = {"R1": 5, "R2": 20}
+    assert choisir_reseau_principal(reseaux, nb) == "R2"
+
+
+def test_choisir_reseau_principal_un_seul_reseau():
+    reseaux = [ReseauRef("R1", "Réseau unique")]
+    assert choisir_reseau_principal(reseaux, {"R1": 3}) == "R1"
+
+
+def test_choisir_reseau_principal_aucun_reseau():
+    assert choisir_reseau_principal([], {}) is None
+
+
+def test_choisir_reseau_principal_reseau_sans_prelevement_compte_zero():
+    reseaux = [ReseauRef("R1", "Réseau 1"), ReseauRef("R2", "Réseau 2")]
+    nb = {"R1": 5}  # R2 absent du dict -> 0 prélèvements
+    assert choisir_reseau_principal(reseaux, nb) == "R1"
