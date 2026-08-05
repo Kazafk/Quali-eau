@@ -4,3 +4,5 @@ cddept,referenceprel,cdparametresiseeaux,cdparametre,libmajparametre,libminparam
 "034","REF-002","NO3","1340","NITRATES (EN NO3)","Nitrates (en NO3)",,"N","L","17","mg/L","162","<=50 mg/L","","17.000000","14797-55-8","ANL-003"
 "034","REF-999","NO3","1340","NITRATES (EN NO3)","Nitrates (en NO3)",,"N","L","20","mg/L","162","<=50 mg/L","","20.000000","14797-55-8","ANL-004"
 "034","REF-001","","","CONCLUSION",,,,,,,,,,,"",""
+"075","REF-003","NO3","1340","NITRATES (EN NO3)","Nitrates (en NO3)",,"N","L","22","mg/L","162","<=50 mg/L","","22.000000","14797-55-8","ANL-005"
+"075","REF-004","NO3","1340","NITRATES (EN NO3)","Nitrates (en NO3)",,"N","L","19","mg/L","162","<=50 mg/L","","19.000000","14797-55-8","ANL-006"

@@ -94,7 +94,7 @@ def test_iter_mesures_valeur_quantifiee():
     prelevements = load_prelevements(os.path.join(FIXTURES_DIR, "DIS_PLV_sample.txt"))
     resultats = list(iter_mesures(os.path.join(FIXTURES_DIR, "DIS_RESULT_sample.txt"), prelevements))
     nitrates = [(insee, m) for insee, code, m in resultats if code == "1340"]
-    assert len(nitrates) == 2  # REF-001 et REF-002 (REF-999 exclu, pas de jointure PLV)
+    assert len(nitrates) == 4  # REF-001, REF-002, REF-003, REF-004 (REF-999 exclu, pas de jointure PLV)
     insee, mesure = nitrates[0]
     assert insee == "34116"
     assert mesure.valeur == 14.0
@@ -118,9 +118,10 @@ def test_iter_mesures_sous_lq_lit_rqana_pas_valtraduite():
 def test_iter_mesures_ignore_referenceprel_inconnu():
     prelevements = load_prelevements(os.path.join(FIXTURES_DIR, "DIS_PLV_sample.txt"))
     resultats = list(iter_mesures(os.path.join(FIXTURES_DIR, "DIS_RESULT_sample.txt"), prelevements))
-    # 5 lignes dans la fixture (REF-001 x2, REF-002, REF-999, ligne sans cdparametre) ;
-    # REF-999 (pas de jointure PLV) et la ligne sans cdparametre doivent être exclues.
-    assert len(resultats) == 3  # 2 nitrates (REF-001, REF-002) + 1 glyphosate (REF-001)
+    # 7 lignes dans la fixture (REF-001 x2, REF-002, REF-999, ligne sans cdparametre,
+    # REF-003, REF-004) ; REF-999 (pas de jointure PLV) et la ligne sans cdparametre
+    # doivent être exclues.
+    assert len(resultats) == 5  # 4 nitrates (REF-001..REF-004) + 1 glyphosate (REF-001)
 
 
 def test_iter_mesures_ignore_ligne_sans_code_parametre():
@@ -128,3 +129,21 @@ def test_iter_mesures_ignore_ligne_sans_code_parametre():
     resultats = list(iter_mesures(os.path.join(FIXTURES_DIR, "DIS_RESULT_sample.txt"), prelevements))
     codes = {code for _, code, _ in resultats}
     assert "" not in codes
+
+
+def test_load_prelevements_ignore_date_malformee(tmp_path):
+    contenu = (
+        "cddept,cdreseau,inseecommuneprinc,nomcommuneprinc,cdreseauamont,nomreseauamont,"
+        "pourcentdebit,referenceprel,dateprel,heureprel,conclusionprel,ugelib,distrlib,"
+        "moalib,plvconformitebacterio,plvconformitechimique,plvconformitereferencebact,"
+        "plvconformitereferencechim\n"
+        '"034","034000123","34116","GRABELS","","","","REF-BAD","00/00/0000","09h00",'
+        '"x","","","","C","C","C","C"\n'
+        '"034","034000123","34116","GRABELS","","","","REF-OK","2026-02-10","09h00",'
+        '"x","","","","C","C","C","C"\n'
+    )
+    chemin = tmp_path / "DIS_PLV_bad.txt"
+    chemin.write_text(contenu, encoding="utf-8")
+    idx = load_prelevements(str(chemin))
+    assert "REF-BAD" not in idx
+    assert "REF-OK" in idx

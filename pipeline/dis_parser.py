@@ -71,10 +71,14 @@ def load_prelevements(plv_path: str) -> dict[str, PrelevementInfo]:
             date_str = row.get("dateprel", "").strip()
             if not ref or not insee or not date_str:
                 continue
+            try:
+                date_prelevement = date.fromisoformat(date_str[:10])
+            except ValueError:
+                continue
             index[ref] = PrelevementInfo(
                 code_insee=normaliser_code_insee(insee),
                 code_reseau=row.get("cdreseau", "").strip(),
-                date_prelevement=date.fromisoformat(date_str[:10]),
+                date_prelevement=date_prelevement,
                 conforme_bacterio=_parse_conformite(row.get("plvconformitebacterio", "")),
                 conforme_chimique=_parse_conformite(row.get("plvconformitechimique", "")),
             )

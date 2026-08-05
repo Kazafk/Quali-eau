@@ -1,7 +1,10 @@
 from datetime import date
 
+import pytest
+
 from pipeline.models import ConclusionBacterio
 from pipeline.compute_scores import selectionner_fenetre_jours, evaluer_bacteriologie
+from pipeline.scoring import score_bacteriologie
 
 
 def test_fenetre_12_mois_si_4_prelevements_ou_plus():
@@ -34,13 +37,17 @@ def test_evaluer_bacteriologie_conforme_sans_historique_non_conforme():
 
 def test_evaluer_bacteriologie_resolue():
     # Non-conformité en janvier, mais le dernier prélèvement (mars) est conforme.
+    # conforme_dernier=False ici (et non True) car score_bacteriologie vérifie
+    # conforme_dernier EN PREMIER et court-circuiterait à 100 sinon, rendant
+    # le cas "résolu" (50) inatteignable — cf. docstring d'evaluer_bacteriologie.
     historique = [
         ConclusionBacterio(date_prelevement=date(2026, 1, 1), conforme=False),
         ConclusionBacterio(date_prelevement=date(2026, 3, 1), conforme=True),
     ]
     conforme_dernier, resolu = evaluer_bacteriologie(historique)
-    assert conforme_dernier is True
+    assert conforme_dernier is False
     assert resolu is True
+    assert score_bacteriologie(conforme_dernier, resolu) == 50.0
 
 
 def test_evaluer_bacteriologie_active():
@@ -144,7 +151,7 @@ def test_calculer_fiche_commune_aucune_mesure_statut_indisponible():
 import os
 
 from pipeline.dis_parser import load_prelevements, load_udi_reseaux
-from pipeline.compute_scores import construire_fiches
+from pipeline.compute_scores import construire_fiches, _trouver_fichier
 
 FIXTURES_DIR = os.path.join(os.path.dirname(__file__), "fixtures")
 
@@ -163,3 +170,58 @@ def test_construire_fiches_depuis_fixtures_reelles():
     assert fiche["statut_donnees"] == "complet"
     # nitrates moyens ~ (14+17)/2-ish pondéré, bien en dessous de 50 -> pas de veto
     assert fiche["scores"]["boisson"]["veto_sanitaire"] is False
+
+
+def test_construire_fiches_bacterio_resolue_via_paris_plm():
+    # Exercise le chemin auparavant non couvert (Finding I5) : REF-003 (mars,
+    # non-conforme) puis REF-004 (juin, conforme) sur l'arrondissement 75101,
+    # normalisé vers 75056 (§2.5.5) -> bactériologie "résolue" (P_bact=50),
+    # pas "conforme" (100).
+    date_ref = date(2026, 8, 5)
+    fiches = construire_fiches(
+        plv_path=os.path.join(FIXTURES_DIR, "DIS_PLV_sample.txt"),
+        result_path=os.path.join(FIXTURES_DIR, "DIS_RESULT_sample.txt"),
+        udi_path=os.path.join(FIXTURES_DIR, "DIS_COM_UDI_sample.txt"),
+        date_reference=date_ref,
+    )
+    assert "75056" in fiches
+    fiche = fiches["75056"]
+    assert fiche["statut_donnees"] == "complet"
+    assert fiche["scores"]["boisson"]["sous_scores"]["securite_sanitaire"] == 50
+
+
+def test_calculer_fiche_commune_parametre_manquant_renormalise_pas_de_faux_100():
+    # BUG CRITIQUE (revue finale, Finding C1) : avant le correctif, un
+    # paramètre jamais mesuré (chlorures/sulfates ici) était remplacé par
+    # 0.0, qui scorait 100 pour ces fonctions précises -> un sous-score
+    # "mineraux_equilibre" artificiellement bon alors qu'aucune donnée
+    # n'existe pour 2 de ses 3 composantes. Ici nitrates=60 (mauvais) est
+    # la SEULE mesure disponible pour ce sous-score : il doit le dominer
+    # entièrement (renormalisé sur son seul poids), pas être dilué à 30
+    # par deux "100" fantômes.
+    date_ref = date(2026, 6, 15)
+    mesures = {"1340": [_mesure(60.0, 30, date_ref)]}
+    historique = [ConclusionBacterio(date_prelevement=date_ref, conforme=True)]
+    fiche = calculer_fiche_commune("00000", mesures, historique, date_ref)
+    assert fiche["scores"]["boisson"]["sous_scores"]["mineraux_equilibre"] == 0
+    assert fiche["scores"]["donnees_partielles"] is True
+
+
+def test_calculer_fiche_commune_cosmetique_sans_aucune_donnee_est_null():
+    date_ref = date(2026, 6, 15)
+    mesures = {"1340": [_mesure(5.0, 30, date_ref)]}  # seule la boisson a des données
+    fiche = calculer_fiche_commune("00000", mesures, [], date_ref)
+    assert fiche["scores"]["cosmetique"]["score"] is None
+    assert fiche["scores"]["cosmetique"]["sous_scores"]["durete_calcaire"] is None
+    assert fiche["scores"]["donnees_partielles"] is True
+
+
+def test_trouver_fichier_resout_nom_suffixe_annee(tmp_path):
+    (tmp_path / "DIS_PLV_2026.txt").write_text("x", encoding="utf-8")
+    resultat = _trouver_fichier(str(tmp_path), "DIS_PLV*.txt")
+    assert resultat.endswith("DIS_PLV_2026.txt")
+
+
+def test_trouver_fichier_leve_si_absent(tmp_path):
+    with pytest.raises(FileNotFoundError):
+        _trouver_fichier(str(tmp_path), "DIS_PLV*.txt")
