@@ -7,14 +7,17 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RAW_DIR = os.path.join(PROJECT_ROOT, "data", "raw")
 
 ZIPS = [
+    # URLs stables /api/1/datasets/r/{id}/ (redirigent vers la dernière version
+    # de la ressource) plutôt que des URLs static.data.gouv.fr horodatées, qui
+    # cassent (404) à chaque republication de la ressource par data.gouv.fr.
     {"year": 2026, "filename": "dis-2026.zip",
-     "url": "https://static.data.gouv.fr/resources/resultats-du-controle-sanitaire-de-leau-distribuee-commune-par-commune/20260601-162255/dis-2026.zip"},
+     "url": "https://www.data.gouv.fr/api/1/datasets/r/2ac3eaa3-7525-4919-8592-7815a868d844"},
     {"year": 2025, "filename": "dis-2025.zip",
-     "url": "https://static.data.gouv.fr/resources/resultats-du-controle-sanitaire-de-leau-distribuee-commune-par-commune/20260422-070223/dis-2025.zip"},
+     "url": "https://www.data.gouv.fr/api/1/datasets/r/7e38c236-dd3c-455e-a728-f0ecb84b1a7c"},
     {"year": 2024, "filename": "dis-2024.zip",
-     "url": "https://static.data.gouv.fr/resources/resultats-du-controle-sanitaire-de-leau-distribuee-commune-par-commune/20260422-071620/dis-2024.zip"},
+     "url": "https://www.data.gouv.fr/api/1/datasets/r/a631e486-c790-42d0-8368-6a42b1a3dc1d"},
     {"year": 2023, "filename": "dis-2023.zip",
-     "url": "https://static.data.gouv.fr/resources/resultats-du-controle-sanitaire-de-leau-distribuee-commune-par-commune/20241014-073810/dis-2023.zip"},
+     "url": "https://www.data.gouv.fr/api/1/datasets/r/c89dec4a-d985-447c-a102-75ba814c398e"},
 ]
 
 
