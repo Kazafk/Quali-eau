@@ -82,3 +82,60 @@ def test_choisir_reseau_principal_reseau_sans_prelevement_compte_zero():
     reseaux = [ReseauRef("R1", "Réseau 1"), ReseauRef("R2", "Réseau 2")]
     nb = {"R1": 5}  # R2 absent du dict -> 0 prélèvements
     assert choisir_reseau_principal(reseaux, nb) == "R1"
+
+
+from pipeline.models import Mesure
+from pipeline.compute_scores import calculer_fiche_commune
+
+
+def _mesure(valeur, jours_avant_ref, date_reference, sous_lq=False):
+    from datetime import timedelta
+    return Mesure(valeur=valeur, sous_lq=sous_lq, date_prelevement=date_reference - timedelta(days=jours_avant_ref))
+
+
+def test_calculer_fiche_commune_eau_bonne_qualite():
+    date_ref = date(2026, 6, 15)
+    mesures = {
+        "1345": [_mesure(10.0, 30, date_ref), _mesure(10.0, 60, date_ref), _mesure(10.0, 90, date_ref), _mesure(10.0, 120, date_ref)],
+        "1398": [_mesure(0.03, 30, date_ref)],
+        "1399": [_mesure(0.03, 30, date_ref)],
+        "1302": [_mesure(7.0, 30, date_ref)],
+        "1295": [_mesure(0.1, 30, date_ref)],
+        "1340": [_mesure(5.0, 30, date_ref)],
+    }
+    historique = [ConclusionBacterio(date_prelevement=date_ref, conforme=True)]
+
+    fiche = calculer_fiche_commune("34116", mesures, historique, date_ref)
+
+    assert fiche["statut_donnees"] == "complet"
+    assert fiche["scores"]["boisson"]["score"] >= 90
+    assert fiche["scores"]["boisson"]["veto_sanitaire"] is False
+    assert fiche["scores"]["cosmetique"]["score"] >= 90
+    assert fiche["scores"]["cosmetique"]["sous_scores"]["durete_calcaire"] == 100
+
+
+def test_calculer_fiche_commune_veto_nitrates_plafonne_le_score():
+    # Régression directe du bug corrigé en v1.3 (§3.1) : un dépassement
+    # nitrates doit réellement plafonner le score boisson, pas juste
+    # cosmétiquement apparaître dans un sous-score.
+    date_ref = date(2026, 6, 15)
+    mesures = {
+        "1345": [_mesure(10.0, 30, date_ref)],
+        "1398": [_mesure(0.03, 30, date_ref)],
+        "1399": [_mesure(0.03, 30, date_ref)],
+        "1302": [_mesure(7.0, 30, date_ref)],
+        "1295": [_mesure(0.1, 30, date_ref)],
+        "1340": [_mesure(60.0, 30, date_ref)],  # > 50 mg/L : veto
+    }
+    historique = [ConclusionBacterio(date_prelevement=date_ref, conforme=True)]
+
+    fiche = calculer_fiche_commune("34116", mesures, historique, date_ref)
+
+    assert fiche["scores"]["boisson"]["veto_sanitaire"] is True
+    assert fiche["scores"]["boisson"]["score"] < 50
+
+
+def test_calculer_fiche_commune_aucune_mesure_statut_indisponible():
+    fiche = calculer_fiche_commune("99999", {}, [], date(2026, 6, 15))
+    assert fiche["statut_donnees"] == "indisponible"
+    assert fiche["scores"] is None
