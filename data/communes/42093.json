@@ -1,0 +1,35 @@
+{
+  "commune": {
+    "code_insee": "42093"
+  },
+  "statut_donnees": "complet",
+  "scores": {
+    "donnees_partielles": true,
+    "boisson": {
+      "score": 96,
+      "veto_sanitaire": false,
+      "sous_scores": {
+        "securite_sanitaire": 100,
+        "mineraux_equilibre": 100,
+        "gout_organoleptique": 80
+      }
+    },
+    "cosmetique": {
+      "score": 79,
+      "sous_scores": {
+        "durete_calcaire": null,
+        "chlore_agressivite": 80,
+        "respect_ph": 55,
+        "metaux_depots": 100
+      }
+    }
+  },
+  "recommandations": [
+    {
+      "usage": "boisson",
+      "type": "carafe",
+      "titre": "Optimiser le goût de l'eau",
+      "description": "Laissez reposer l'eau 20 minutes au frais en carafe ouverte pour éliminer le chlore avant dégustation."
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "commune": {
+    "code_insee": "68105"
+  },
+  "statut_donnees": "complet",
+  "scores": {
+    "donnees_partielles": true,
+    "boisson": {
+      "score": 92,
+      "veto_sanitaire": false,
+      "sous_scores": {
+        "securite_sanitaire": 100,
+        "mineraux_equilibre": 76,
+        "gout_organoleptique": 88
+      }
+    },
+    "cosmetique": {
+      "score": 84,
+      "sous_scores": {
+        "durete_calcaire": 81,
+        "chlore_agressivite": 80,
+        "respect_ph": 100,
+        "metaux_depots": null
+      }
+    }
+  },
+  "recommandations": [
+    {
+      "usage": "boisson",
+      "type": "nitrates_biberons",
+      "titre": "Précaution nourrissons",
+      "description": "Éviter pour les biberons (< 15 mg/L conseillé). Osmoseur recommandé si > 40 mg/L.",
+      "estimation_cout": {
+        "materiel": "Osmoseur inverse basique (3 étages)",
+        "achat_eur": "200-300",
+        "entretien_annuel_eur": "60 (cartouches + membrane)",
+        "niveau_severite": "eleve"
+      }
+    },
+    {
+      "usage": "boisson",
+      "type": "carafe",
+      "titre": "Optimiser le goût de l'eau",
+      "description": "Laissez reposer l'eau 20 minutes au frais en carafe ouverte pour éliminer le chlore avant dégustation."
+    }
+  ]
+}

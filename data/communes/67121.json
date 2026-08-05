@@ -1,0 +1,28 @@
+{
+  "commune": {
+    "code_insee": "67121"
+  },
+  "statut_donnees": "complet",
+  "scores": {
+    "donnees_partielles": true,
+    "boisson": {
+      "score": 95,
+      "veto_sanitaire": false,
+      "sous_scores": {
+        "securite_sanitaire": 100,
+        "mineraux_equilibre": 90,
+        "gout_organoleptique": 88
+      }
+    },
+    "cosmetique": {
+      "score": 81,
+      "sous_scores": {
+        "durete_calcaire": 82,
+        "chlore_agressivite": 80,
+        "respect_ph": 80,
+        "metaux_depots": 78
+      }
+    }
+  },
+  "recommandations": []
+}

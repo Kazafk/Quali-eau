@@ -1,0 +1,35 @@
+{
+  "commune": {
+    "code_insee": "19078"
+  },
+  "statut_donnees": "complet",
+  "scores": {
+    "donnees_partielles": true,
+    "boisson": {
+      "score": 0,
+      "veto_sanitaire": true,
+      "sous_scores": {
+        "securite_sanitaire": 0,
+        "mineraux_equilibre": 100,
+        "gout_organoleptique": 80
+      }
+    },
+    "cosmetique": {
+      "score": 95,
+      "sous_scores": {
+        "durete_calcaire": 100,
+        "chlore_agressivite": null,
+        "respect_ph": 80,
+        "metaux_depots": null
+      }
+    }
+  },
+  "recommandations": [
+    {
+      "usage": "boisson",
+      "type": "alerte_bacteriologique",
+      "titre": "Non-conformité bactériologique active",
+      "description": "Relayez la consigne officielle ARS/préfecture (ébullition ou restriction) — ne jamais minimiser."
+    }
+  ]
+}

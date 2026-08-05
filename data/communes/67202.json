@@ -1,0 +1,53 @@
+{
+  "commune": {
+    "code_insee": "67202"
+  },
+  "statut_donnees": "complet",
+  "scores": {
+    "donnees_partielles": true,
+    "boisson": {
+      "score": 90,
+      "veto_sanitaire": false,
+      "sous_scores": {
+        "securite_sanitaire": 100,
+        "mineraux_equilibre": 76,
+        "gout_organoleptique": 80
+      }
+    },
+    "cosmetique": {
+      "score": 61,
+      "sous_scores": {
+        "durete_calcaire": 24,
+        "chlore_agressivite": 80,
+        "respect_ph": 100,
+        "metaux_depots": 100
+      }
+    }
+  },
+  "recommandations": [
+    {
+      "usage": "boisson",
+      "type": "nitrates_biberons",
+      "titre": "Précaution nourrissons",
+      "description": "Éviter pour les biberons (< 15 mg/L conseillé). Osmoseur recommandé si > 40 mg/L.",
+      "estimation_cout": {
+        "materiel": "Osmoseur inverse basique (3 étages)",
+        "achat_eur": "200-300",
+        "entretien_annuel_eur": "60 (cartouches + membrane)",
+        "niveau_severite": "eleve"
+      }
+    },
+    {
+      "usage": "cosmetique",
+      "type": "adoucisseur",
+      "titre": "Dimensionner un adoucisseur adapté",
+      "description": "TH de 42.00 °fH : un équipement dimensionné à ce niveau de dureté limite les régénérations trop fréquentes.",
+      "estimation_cout": {
+        "materiel": "Adoucisseur haute capacité (> 25 L)",
+        "achat_eur": "1600-2000",
+        "entretien_annuel_eur": "70-100 (8+ sacs de sel/an)",
+        "niveau_severite": "extreme"
+      }
+    }
+  ]
+}

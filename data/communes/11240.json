@@ -1,0 +1,28 @@
+{
+  "commune": {
+    "code_insee": "11240"
+  },
+  "statut_donnees": "complet",
+  "scores": {
+    "donnees_partielles": true,
+    "boisson": {
+      "score": 15,
+      "veto_sanitaire": true,
+      "sous_scores": {
+        "securite_sanitaire": 15,
+        "mineraux_equilibre": 100,
+        "gout_organoleptique": 100
+      }
+    },
+    "cosmetique": {
+      "score": 81,
+      "sous_scores": {
+        "durete_calcaire": 76,
+        "chlore_agressivite": 80,
+        "respect_ph": 80,
+        "metaux_depots": 98
+      }
+    }
+  },
+  "recommandations": []
+}

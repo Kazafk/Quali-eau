@@ -1,0 +1,41 @@
+{
+  "commune": {
+    "code_insee": "58056"
+  },
+  "statut_donnees": "complet",
+  "scores": {
+    "donnees_partielles": true,
+    "boisson": {
+      "score": 98,
+      "veto_sanitaire": false,
+      "sous_scores": {
+        "securite_sanitaire": 100,
+        "mineraux_equilibre": 90,
+        "gout_organoleptique": 100
+      }
+    },
+    "cosmetique": {
+      "score": 47,
+      "sous_scores": {
+        "durete_calcaire": 1,
+        "chlore_agressivite": 80,
+        "respect_ph": 80,
+        "metaux_depots": 100
+      }
+    }
+  },
+  "recommandations": [
+    {
+      "usage": "cosmetique",
+      "type": "adoucisseur",
+      "titre": "Dimensionner un adoucisseur adapté",
+      "description": "TH de 49.57 °fH : un équipement dimensionné à ce niveau de dureté limite les régénérations trop fréquentes.",
+      "estimation_cout": {
+        "materiel": "Adoucisseur haute capacité (> 25 L)",
+        "achat_eur": "1600-2000",
+        "entretien_annuel_eur": "70-100 (8+ sacs de sel/an)",
+        "niveau_severite": "extreme"
+      }
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "commune": {
+    "code_insee": "97609"
+  },
+  "statut_donnees": "complet",
+  "scores": {
+    "donnees_partielles": true,
+    "boisson": {
+      "score": 36,
+      "veto_sanitaire": true,
+      "sous_scores": {
+        "securite_sanitaire": 36,
+        "mineraux_equilibre": 100,
+        "gout_organoleptique": 44
+      }
+    },
+    "cosmetique": {
+      "score": 73,
+      "sous_scores": {
+        "durete_calcaire": 95,
+        "chlore_agressivite": 20,
+        "respect_ph": 100,
+        "metaux_depots": 70
+      }
+    }
+  },
+  "recommandations": [
+    {
+      "usage": "boisson",
+      "type": "nitrites_alerte",
+      "titre": "Dépassement nitrites",
+      "description": "Teneur en nitrites au-dessus de la limite de qualité réglementaire (0,1 mg/L) — traitement par osmose inverse recommandé.",
+      "estimation_cout": {
+        "materiel": "Osmoseur à pompe de perméat + reminéralisation",
+        "achat_eur": "450-700",
+        "entretien_annuel_eur": "90 (membrane 0,0001 µm saturée plus vite)",
+        "niveau_severite": "extreme"
+      }
+    },
+    {
+      "usage": "cosmetique",
+      "type": "pommeau_filtrant",
+      "titre": "Protéger la peau du chlore",
+      "description": "Pommeau de douche avec filtre KDF ou billes céramiques recommandé."
+    },
+    {
+      "usage": "boisson",
+      "type": "carafe",
+      "titre": "Optimiser le goût de l'eau",
+      "description": "Laissez reposer l'eau 20 minutes au frais en carafe ouverte pour éliminer le chlore avant dégustation."
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "commune": {
+    "code_insee": "14240"
+  },
+  "statut_donnees": "complet",
+  "scores": {
+    "donnees_partielles": true,
+    "boisson": {
+      "score": 80,
+      "veto_sanitaire": false,
+      "sous_scores": {
+        "securite_sanitaire": null,
+        "mineraux_equilibre": null,
+        "gout_organoleptique": 80
+      }
+    },
+    "cosmetique": {
+      "score": 80,
+      "sous_scores": {
+        "durete_calcaire": null,
+        "chlore_agressivite": 80,
+        "respect_ph": null,
+        "metaux_depots": null
+      }
+    }
+  },
+  "recommandations": []
+}

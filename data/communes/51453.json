@@ -1,0 +1,65 @@
+{
+  "commune": {
+    "code_insee": "51453"
+  },
+  "statut_donnees": "complet",
+  "scores": {
+    "donnees_partielles": true,
+    "boisson": {
+      "score": 71,
+      "veto_sanitaire": false,
+      "sous_scores": {
+        "securite_sanitaire": 70,
+        "mineraux_equilibre": 65,
+        "gout_organoleptique": 80
+      }
+    },
+    "cosmetique": {
+      "score": 61,
+      "sous_scores": {
+        "durete_calcaire": null,
+        "chlore_agressivite": 50,
+        "respect_ph": 80,
+        "metaux_depots": null
+      }
+    }
+  },
+  "recommandations": [
+    {
+      "usage": "boisson",
+      "type": "filtration_chimique",
+      "titre": "Filtration recommandée (pesticides/PFAS)",
+      "description": "Filtration sous évier (bloc charbon actif haute densité ou osmose inverse selon le niveau de dépassement).",
+      "estimation_cout": {
+        "materiel": "Osmoseur inverse basique (3 étages)",
+        "achat_eur": "200-300",
+        "entretien_annuel_eur": "60 (cartouches + membrane)",
+        "niveau_severite": "eleve"
+      }
+    },
+    {
+      "usage": "boisson",
+      "type": "nitrates_biberons",
+      "titre": "Précaution nourrissons",
+      "description": "Éviter pour les biberons (< 15 mg/L conseillé). Osmoseur recommandé si > 40 mg/L.",
+      "estimation_cout": {
+        "materiel": "Osmoseur inverse basique (3 étages)",
+        "achat_eur": "200-300",
+        "entretien_annuel_eur": "60 (cartouches + membrane)",
+        "niveau_severite": "eleve"
+      }
+    },
+    {
+      "usage": "cosmetique",
+      "type": "pommeau_filtrant",
+      "titre": "Protéger la peau du chlore",
+      "description": "Pommeau de douche avec filtre KDF ou billes céramiques recommandé."
+    },
+    {
+      "usage": "boisson",
+      "type": "carafe",
+      "titre": "Optimiser le goût de l'eau",
+      "description": "Laissez reposer l'eau 20 minutes au frais en carafe ouverte pour éliminer le chlore avant dégustation."
+    }
+  ]
+}

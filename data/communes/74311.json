@@ -1,0 +1,53 @@
+{
+  "commune": {
+    "code_insee": "74311"
+  },
+  "statut_donnees": "complet",
+  "scores": {
+    "donnees_partielles": false,
+    "boisson": {
+      "score": 70,
+      "veto_sanitaire": false,
+      "sous_scores": {
+        "securite_sanitaire": 50,
+        "mineraux_equilibre": 97,
+        "gout_organoleptique": 92
+      }
+    },
+    "cosmetique": {
+      "score": 61,
+      "sous_scores": {
+        "durete_calcaire": 21,
+        "chlore_agressivite": 100,
+        "respect_ph": 80,
+        "metaux_depots": 100
+      }
+    }
+  },
+  "recommandations": [
+    {
+      "usage": "boisson",
+      "type": "filtration_chimique",
+      "titre": "Filtration recommandée (pesticides/PFAS)",
+      "description": "Filtration sous évier (bloc charbon actif haute densité ou osmose inverse selon le niveau de dépassement).",
+      "estimation_cout": {
+        "materiel": "Osmoseur inverse basique (3 étages)",
+        "achat_eur": "200-300",
+        "entretien_annuel_eur": "60 (cartouches + membrane)",
+        "niveau_severite": "eleve"
+      }
+    },
+    {
+      "usage": "cosmetique",
+      "type": "adoucisseur",
+      "titre": "Dimensionner un adoucisseur adapté",
+      "description": "TH de 42.97 °fH : un équipement dimensionné à ce niveau de dureté limite les régénérations trop fréquentes.",
+      "estimation_cout": {
+        "materiel": "Adoucisseur haute capacité (> 25 L)",
+        "achat_eur": "1600-2000",
+        "entretien_annuel_eur": "70-100 (8+ sacs de sel/an)",
+        "niveau_severite": "extreme"
+      }
+    }
+  ]
+}

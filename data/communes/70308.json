@@ -1,0 +1,28 @@
+{
+  "commune": {
+    "code_insee": "70308"
+  },
+  "statut_donnees": "complet",
+  "scores": {
+    "donnees_partielles": true,
+    "boisson": {
+      "score": 98,
+      "veto_sanitaire": false,
+      "sous_scores": {
+        "securite_sanitaire": 100,
+        "mineraux_equilibre": 100,
+        "gout_organoleptique": 92
+      }
+    },
+    "cosmetique": {
+      "score": 84,
+      "sous_scores": {
+        "durete_calcaire": 85,
+        "chlore_agressivite": 80,
+        "respect_ph": 85,
+        "metaux_depots": null
+      }
+    }
+  },
+  "recommandations": []
+}

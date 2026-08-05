@@ -1,0 +1,47 @@
+{
+  "commune": {
+    "code_insee": "07192"
+  },
+  "statut_donnees": "complet",
+  "scores": {
+    "donnees_partielles": true,
+    "boisson": {
+      "score": 70,
+      "veto_sanitaire": false,
+      "sous_scores": {
+        "securite_sanitaire": 50,
+        "mineraux_equilibre": 100,
+        "gout_organoleptique": 88
+      }
+    },
+    "cosmetique": {
+      "score": 84,
+      "sous_scores": {
+        "durete_calcaire": 85,
+        "chlore_agressivite": 80,
+        "respect_ph": 85,
+        "metaux_depots": null
+      }
+    }
+  },
+  "recommandations": [
+    {
+      "usage": "boisson",
+      "type": "filtration_chimique",
+      "titre": "Filtration recommandée (pesticides/PFAS)",
+      "description": "Filtration sous évier (bloc charbon actif haute densité ou osmose inverse selon le niveau de dépassement).",
+      "estimation_cout": {
+        "materiel": "Filtre sous-évier à charbon actif",
+        "achat_eur": "80-120",
+        "entretien_annuel_eur": "30 (1 cartouche/an)",
+        "niveau_severite": "modere"
+      }
+    },
+    {
+      "usage": "boisson",
+      "type": "carafe",
+      "titre": "Optimiser le goût de l'eau",
+      "description": "Laissez reposer l'eau 20 minutes au frais en carafe ouverte pour éliminer le chlore avant dégustation."
+    }
+  ]
+}

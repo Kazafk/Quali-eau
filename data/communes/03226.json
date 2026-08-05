@@ -1,0 +1,28 @@
+{
+  "commune": {
+    "code_insee": "03226"
+  },
+  "statut_donnees": "complet",
+  "scores": {
+    "donnees_partielles": true,
+    "boisson": {
+      "score": 95,
+      "veto_sanitaire": false,
+      "sous_scores": {
+        "securite_sanitaire": 100,
+        "mineraux_equilibre": null,
+        "gout_organoleptique": 80
+      }
+    },
+    "cosmetique": {
+      "score": 88,
+      "sous_scores": {
+        "durete_calcaire": null,
+        "chlore_agressivite": 80,
+        "respect_ph": 100,
+        "metaux_depots": null
+      }
+    }
+  },
+  "recommandations": []
+}

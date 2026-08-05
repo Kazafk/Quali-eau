@@ -1,0 +1,28 @@
+{
+  "commune": {
+    "code_insee": "73206"
+  },
+  "statut_donnees": "complet",
+  "scores": {
+    "donnees_partielles": true,
+    "boisson": {
+      "score": 68,
+      "veto_sanitaire": false,
+      "sous_scores": {
+        "securite_sanitaire": 50,
+        "mineraux_equilibre": 99,
+        "gout_organoleptique": 80
+      }
+    },
+    "cosmetique": {
+      "score": 77,
+      "sous_scores": {
+        "durete_calcaire": 83,
+        "chlore_agressivite": 80,
+        "respect_ph": 55,
+        "metaux_depots": null
+      }
+    }
+  },
+  "recommandations": []
+}

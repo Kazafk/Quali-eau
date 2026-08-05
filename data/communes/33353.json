@@ -1,0 +1,41 @@
+{
+  "commune": {
+    "code_insee": "33353"
+  },
+  "statut_donnees": "complet",
+  "scores": {
+    "donnees_partielles": true,
+    "boisson": {
+      "score": 92,
+      "veto_sanitaire": false,
+      "sous_scores": {
+        "securite_sanitaire": 100,
+        "mineraux_equilibre": null,
+        "gout_organoleptique": 70
+      }
+    },
+    "cosmetique": {
+      "score": 66,
+      "sous_scores": {
+        "durete_calcaire": null,
+        "chlore_agressivite": 50,
+        "respect_ph": 80,
+        "metaux_depots": 80
+      }
+    }
+  },
+  "recommandations": [
+    {
+      "usage": "cosmetique",
+      "type": "pommeau_filtrant",
+      "titre": "Protéger la peau du chlore",
+      "description": "Pommeau de douche avec filtre KDF ou billes céramiques recommandé."
+    },
+    {
+      "usage": "boisson",
+      "type": "carafe",
+      "titre": "Optimiser le goût de l'eau",
+      "description": "Laissez reposer l'eau 20 minutes au frais en carafe ouverte pour éliminer le chlore avant dégustation."
+    }
+  ]
+}

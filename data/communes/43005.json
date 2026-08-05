@@ -1,0 +1,28 @@
+{
+  "commune": {
+    "code_insee": "43005"
+  },
+  "statut_donnees": "complet",
+  "scores": {
+    "donnees_partielles": true,
+    "boisson": {
+      "score": 66,
+      "veto_sanitaire": false,
+      "sous_scores": {
+        "securite_sanitaire": 50,
+        "mineraux_equilibre": 90,
+        "gout_organoleptique": 80
+      }
+    },
+    "cosmetique": {
+      "score": 88,
+      "sous_scores": {
+        "durete_calcaire": 90,
+        "chlore_agressivite": 80,
+        "respect_ph": 80,
+        "metaux_depots": 100
+      }
+    }
+  },
+  "recommandations": []
+}

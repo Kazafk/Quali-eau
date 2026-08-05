@@ -1,0 +1,28 @@
+{
+  "commune": {
+    "code_insee": "65309"
+  },
+  "statut_donnees": "complet",
+  "scores": {
+    "donnees_partielles": true,
+    "boisson": {
+      "score": 98,
+      "veto_sanitaire": false,
+      "sous_scores": {
+        "securite_sanitaire": 100,
+        "mineraux_equilibre": null,
+        "gout_organoleptique": 92
+      }
+    },
+    "cosmetique": {
+      "score": 83,
+      "sous_scores": {
+        "durete_calcaire": null,
+        "chlore_agressivite": 100,
+        "respect_ph": 55,
+        "metaux_depots": null
+      }
+    }
+  },
+  "recommandations": []
+}

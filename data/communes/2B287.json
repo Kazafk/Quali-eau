@@ -1,0 +1,28 @@
+{
+  "commune": {
+    "code_insee": "2B287"
+  },
+  "statut_donnees": "complet",
+  "scores": {
+    "donnees_partielles": true,
+    "boisson": {
+      "score": 69,
+      "veto_sanitaire": false,
+      "sous_scores": {
+        "securite_sanitaire": 50,
+        "mineraux_equilibre": 100,
+        "gout_organoleptique": 80
+      }
+    },
+    "cosmetique": {
+      "score": 92,
+      "sous_scores": {
+        "durete_calcaire": 96,
+        "chlore_agressivite": null,
+        "respect_ph": 80,
+        "metaux_depots": null
+      }
+    }
+  },
+  "recommandations": []
+}
