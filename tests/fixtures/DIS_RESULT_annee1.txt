@@ -1,0 +1,2 @@
+cddept,referenceprel,cdparametresiseeaux,cdparametre,libmajparametre,libminparametre,libwebparametre,qualitparam,insituana,rqana,cdunitereferencesiseeaux,cdunitereference,limitequal,refqual,valtraduite,casparam,referenceanl
+"012","REF-A1","NO3","1340","NITRATES (EN NO3)","Nitrates (en NO3)",,"N","L","10","mg/L","162","<=50 mg/L","","10.000000","14797-55-8","ANL-A1"

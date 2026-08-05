@@ -147,3 +147,28 @@ def test_load_prelevements_ignore_date_malformee(tmp_path):
     idx = load_prelevements(str(chemin))
     assert "REF-BAD" not in idx
     assert "REF-OK" in idx
+
+
+def test_charger_prelevements_multi_fusionne_plusieurs_annees():
+    from pipeline.dis_parser import charger_prelevements_multi
+    idx = charger_prelevements_multi([
+        os.path.join(FIXTURES_DIR, "DIS_PLV_annee1.txt"),
+        os.path.join(FIXTURES_DIR, "DIS_PLV_annee2.txt"),
+    ])
+    assert set(idx) == {"REF-A1", "REF-A2"}
+    assert idx["REF-A1"].code_insee == "12345"
+    assert idx["REF-A2"].code_insee == "12345"
+
+
+def test_iter_mesures_multi_chaine_plusieurs_annees():
+    from pipeline.dis_parser import charger_prelevements_multi, iter_mesures_multi
+    prelevements = charger_prelevements_multi([
+        os.path.join(FIXTURES_DIR, "DIS_PLV_annee1.txt"),
+        os.path.join(FIXTURES_DIR, "DIS_PLV_annee2.txt"),
+    ])
+    resultats = list(iter_mesures_multi([
+        os.path.join(FIXTURES_DIR, "DIS_RESULT_annee1.txt"),
+        os.path.join(FIXTURES_DIR, "DIS_RESULT_annee2.txt"),
+    ], prelevements))
+    valeurs = sorted(m.valeur for _, code, m in resultats if code == "1340")
+    assert valeurs == [10.0, 12.0]

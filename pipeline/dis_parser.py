@@ -136,3 +136,19 @@ def iter_mesures(result_path: str, prelevements: dict[str, "PrelevementInfo"]):
                 continue
             mesure = Mesure(valeur=valeur, sous_lq=sous_lq, date_prelevement=info.date_prelevement)
             yield info.code_insee, code_parametre, mesure
+
+
+def charger_prelevements_multi(plv_paths: list[str]) -> dict[str, "PrelevementInfo"]:
+    """Fusionne plusieurs fichiers DIS_PLV annuels (§2.1) en un seul index
+    referenceprel -> PrelevementInfo."""
+    index: dict[str, PrelevementInfo] = {}
+    for chemin in plv_paths:
+        index.update(load_prelevements(chemin))
+    return index
+
+
+def iter_mesures_multi(result_paths: list[str], prelevements: dict):
+    """Chaîne le flux de plusieurs fichiers DIS_RESULT annuels (générateur,
+    ne charge aucun fichier entier en mémoire — cf. iter_mesures)."""
+    for chemin in result_paths:
+        yield from iter_mesures(chemin, prelevements)

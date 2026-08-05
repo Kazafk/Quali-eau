@@ -1,0 +1,2 @@
+cddept,cdreseau,inseecommuneprinc,nomcommuneprinc,cdreseauamont,nomreseauamont,pourcentdebit,referenceprel,dateprel,heureprel,conclusionprel,ugelib,distrlib,moalib,plvconformitebacterio,plvconformitechimique,plvconformitereferencebact,plvconformitereferencechim
+"012","012000001","12345","TESTVILLE","","","","REF-A1","2025-01-10","09h00","x","","","","C","C","C","C"
