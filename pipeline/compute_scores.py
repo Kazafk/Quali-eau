@@ -363,14 +363,16 @@ def construire_fiches(plv_paths: list[str], result_paths: list[str], udi_path: s
     return fiches
 
 
-def _trouver_fichier(raw_dir: str, motif: str) -> str:
-    """Résout un fichier DIS par motif glob plutôt qu'un nom exact : les
-    ZIPs extraits par pipeline/download_data.py gardent leur suffixe
-    d'année (DIS_PLV_2026.txt), pas un nom générique."""
+def _trouver_fichiers(raw_dir: str, motif: str) -> list[str]:
+    """Résout tous les fichiers DIS correspondant au motif, à plat dans
+    raw_dir OU dans ses sous-répertoires annuels (data/raw/{annee}/...,
+    layout réel produit par pipeline/download_data.py). Retourne une liste
+    triée (donc chronologique pour des noms suffixés par année)."""
     correspondances = sorted(glob.glob(os.path.join(raw_dir, motif)))
+    correspondances += sorted(glob.glob(os.path.join(raw_dir, "*", motif)))
     if not correspondances:
-        raise FileNotFoundError(f"Aucun fichier correspondant à {motif!r} dans {raw_dir}")
-    return correspondances[0]
+        raise FileNotFoundError(f"Aucun fichier correspondant à {motif!r} dans {raw_dir} (ni ses sous-répertoires)")
+    return correspondances
 
 
 def main(raw_dir: str, output_dir: str, date_reference: date | None = None) -> None:
@@ -379,11 +381,11 @@ def main(raw_dir: str, output_dir: str, date_reference: date | None = None) -> N
     raffinement futur), écrit une fiche JSON par commune sous
     `output_dir/communes/{code_insee}.json` + un `index.json` global."""
     date_reference = date_reference or datetime.now(timezone.utc).date()
-    plv_path = _trouver_fichier(raw_dir, "DIS_PLV*.txt")
-    result_path = _trouver_fichier(raw_dir, "DIS_RESULT*.txt")
-    udi_path = _trouver_fichier(raw_dir, "DIS_COM_UDI*.txt")
+    plv_paths = _trouver_fichiers(raw_dir, "DIS_PLV*.txt")
+    result_paths = _trouver_fichiers(raw_dir, "DIS_RESULT*.txt")
+    udi_path = _trouver_fichiers(raw_dir, "DIS_COM_UDI*.txt")[-1]  # référentiel réseau : année la plus récente uniquement
 
-    fiches = construire_fiches([plv_path], [result_path], udi_path, date_reference)
+    fiches = construire_fiches(plv_paths, result_paths, udi_path, date_reference)
 
     communes_dir = os.path.join(output_dir, "communes")
     os.makedirs(communes_dir, exist_ok=True)
@@ -403,6 +405,6 @@ def main(raw_dir: str, output_dir: str, date_reference: date | None = None) -> N
 if __name__ == "__main__":
     PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     main(
-        raw_dir=os.path.join(PROJECT_ROOT, "data", "raw", "2026"),
+        raw_dir=os.path.join(PROJECT_ROOT, "data", "raw"),
         output_dir=os.path.join(PROJECT_ROOT, "public", "data"),
     )

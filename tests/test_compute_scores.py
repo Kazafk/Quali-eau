@@ -151,7 +151,7 @@ def test_calculer_fiche_commune_aucune_mesure_statut_indisponible():
 import os
 
 from pipeline.dis_parser import load_prelevements, load_udi_reseaux
-from pipeline.compute_scores import construire_fiches, _trouver_fichier
+from pipeline.compute_scores import construire_fiches, _trouver_fichiers
 
 FIXTURES_DIR = os.path.join(os.path.dirname(__file__), "fixtures")
 
@@ -232,12 +232,23 @@ def test_construire_fiches_commune_sans_mesure_recoit_fiche_indisponible():
     assert fiches["99999"]["scores"] is None
 
 
-def test_trouver_fichier_resout_nom_suffixe_annee(tmp_path):
-    (tmp_path / "DIS_PLV_2026.txt").write_text("x", encoding="utf-8")
-    resultat = _trouver_fichier(str(tmp_path), "DIS_PLV*.txt")
-    assert resultat.endswith("DIS_PLV_2026.txt")
+def test_trouver_fichiers_recherche_sous_repertoires_annuels(tmp_path):
+    (tmp_path / "2025").mkdir()
+    (tmp_path / "2026").mkdir()
+    (tmp_path / "2025" / "DIS_PLV_2025.txt").write_text("x", encoding="utf-8")
+    (tmp_path / "2026" / "DIS_PLV_2026.txt").write_text("x", encoding="utf-8")
+    resultats = _trouver_fichiers(str(tmp_path), "DIS_PLV*.txt")
+    assert len(resultats) == 2
+    assert resultats[0].endswith("DIS_PLV_2025.txt")
+    assert resultats[1].endswith("DIS_PLV_2026.txt")
 
 
-def test_trouver_fichier_leve_si_absent(tmp_path):
+def test_trouver_fichiers_recherche_aussi_a_plat(tmp_path):
+    (tmp_path / "DIS_PLV.txt").write_text("x", encoding="utf-8")
+    resultats = _trouver_fichiers(str(tmp_path), "DIS_PLV*.txt")
+    assert len(resultats) == 1
+
+
+def test_trouver_fichiers_leve_si_absent(tmp_path):
     with pytest.raises(FileNotFoundError):
-        _trouver_fichier(str(tmp_path), "DIS_PLV*.txt")
+        _trouver_fichiers(str(tmp_path), "DIS_PLV*.txt")
