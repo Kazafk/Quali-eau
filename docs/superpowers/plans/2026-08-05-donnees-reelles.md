@@ -506,6 +506,8 @@ Expected: a plausible number of fiches (tens of thousands), close to (not wildly
 
 ## Out of Scope (separate future plan)
 
+- **Final whole-branch review findings deferred (2026-08-05, diff `87a3fe1..cb51abf`, "Ready to merge: Yes"):** `historique_bacterio_par_commune` in `construire_fiches` still accumulates bacteriological history with no date bound (unlike measurements, which are now capped to `FENETRE_MAX_JOURS`) — correctness is unaffected since `calculer_fiche_commune` already filters it by window internally, but it's the same unbounded-memory pattern `CODES_CONSOMMES`/`FENETRE_MAX_JOURS` were meant to close, just not yet applied here. The `construire_fiches` docstring documents the `CODES_CONSOMMES` half of what "exploitable data" means but not the `FENETRE_MAX_JOURS` half (covered only by an inline code comment). Neither blocks Task 5.
+
 - **Réseau-principal filtering inside `construire_fiches`** — still not wired in (carried over from the previous plan); a genuinely multi-réseau commune still has all its réseaux' measurements merged together rather than scored per-réseau.
 - **`national.geojson` / map geometry, the full §5.3 fiche schema (`reseaux[]`, `historique`, `indicateurs_cles`, `commune.nom/departement/population`), and the static site itself** — all Phase 2, a separate plan.
 - **N1 from the previous plan's final review** (weighted-formula duplication between `pipeline/scoring.py` and `pipeline/compute_scores.py`) — unaffected by this plan, still needs a decision before either file is next touched.
