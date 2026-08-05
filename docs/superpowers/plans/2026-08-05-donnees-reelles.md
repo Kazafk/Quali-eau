@@ -447,25 +447,27 @@ python pipeline/download_data.py
 ```
 Expected: 4 ZIPs downloaded to `data/raw/` (`dis-2023.zip` .. `dis-2026.zip`, ~900 Mo total) and extracted into `data/raw/2023/` .. `data/raw/2026/`, each containing `DIS_PLV_{year}.txt`, `DIS_RESULT_{year}.txt`, `DIS_COM_UDI_{year}.txt`. This will take a while depending on connection speed — let it run to completion.
 
+**Also record at this step (final review findings M3/M4):** list the actual extracted filenames (`ls data/raw/*/`) and note their exact casing — `_trouver_fichiers`' glob is case-sensitive on Linux (the CI workflow's future OS), even though case-insensitive on this Windows machine, so a real filename like `dis_plv_2026.txt` would silently fail to match `"DIS_PLV*.txt"` in CI even though it works here. Also confirm the files land directly in `data/raw/{year}/` and not one level deeper (some ZIPs contain a root folder) — `_trouver_fichiers` only searches one level of subdirectory, so a nested layout would fail with `FileNotFoundError`, not silently.
+
 - [ ] **Step 2: Run the real scoring pipeline, timed and memory-tracked**
 
 ```bash
 cd "C:/Repos/Quali'eau"
+pip install psutil
 python -c "
-import time, tracemalloc, sys
+import time, os, sys
 sys.path.insert(0, '.')
 from pipeline.compute_scores import main
-import os
-tracemalloc.start()
+import psutil
+process = psutil.Process(os.getpid())
 t0 = time.time()
 main(raw_dir=os.path.join('data', 'raw'), output_dir=os.path.join('public', 'data'))
 elapsed = time.time() - t0
-current, peak = tracemalloc.get_traced_memory()
-tracemalloc.stop()
-print(f'Terminé en {elapsed:.1f}s, pic mémoire {peak/1e6:.0f} Mo')
+peak_mo = process.memory_info().rss / 1e6
+print(f'Terminé en {elapsed:.1f}s, RSS en fin d\'exécution {peak_mo:.0f} Mo')
 "
 ```
-Expected: completes without crashing, prints elapsed time and peak memory. If peak memory is in the multiple-GB range despite the `CODES_CONSOMMES` filter from Task 2, stop and report back before proceeding — that would mean the filter isn't working as expected, not something to silently work around.
+Expected: completes without crashing. **A peak RSS in the 1-2 Go range is normal and expected**, not a sign of a broken filter — `CODES_CONSOMMES` narrows to ~35 parameter codes but still retains up to 730 days of history across ~35 000 communes, and `Mesure`/`PrelevementInfo` are plain (non-`slots`) dataclasses. Use `psutil` for a real RSS reading rather than `tracemalloc` — `tracemalloc` itself roughly doubles memory and slows execution 2-4×, which risks a false OOM on a multi-Go run instead of just measuring one. **Stop and report back only if RSS exceeds roughly 6 Go**, or if the run doesn't complete at all.
 
 - [ ] **Step 3: Sanity-check the output**
 
@@ -476,14 +478,25 @@ import json, os
 files = os.listdir('public/data/communes')
 print(f'{len(files)} fiches communales générées')
 with open('public/data/index.json', encoding='utf-8') as f:
-    print(json.load(f))
+    index = json.load(f)
+    print(index)
+# Repère de cohérence (finding M6) : comparer au nombre de communes du
+# référentiel réseau le plus récent, pas seulement se fier à \"des dizaines
+# de milliers\" — un écart important signale un problème de résolution de
+# fichiers ou de fusion, pas juste des communes fusionnées/dissoutes.
+import glob
+udi_paths = sorted(glob.glob('data/raw/*/DIS_COM_UDI*.txt'))
+with open(udi_paths[-1], encoding='utf-8') as f:
+    import csv
+    communes_udi = {row['inseecommune'] for row in csv.DictReader(f)}
+print(f'{len(communes_udi)} communes dans le référentiel UDI le plus récent, {len(files)} fiches générées')
 # Inspecte une commune connue (Paris, déjà utilisée comme exemple dans SPECIFICATION.md)
 with open('public/data/communes/75056.json', encoding='utf-8') as f:
     fiche = json.load(f)
     print(json.dumps(fiche, indent=2, ensure_ascii=False)[:2000])
 "
 ```
-Expected: a plausible number of fiches (tens of thousands), `index.json` with sensible `nb_communes_scorees`/`nb_communes_sans_donnees` counts, and Paris's fiche (`75056`) showing a `statut_donnees: "complet"` with scores that look plausible (not `null`, not obviously wrong given what's publicly known about Paris tap water — e.g. a "durete_calcaire" note reflecting genuinely hard water).
+Expected: a plausible number of fiches (tens of thousands), close to (not wildly different from) the UDI referential's commune count — a large gap is a red flag, not just "communes without data," since Task 2 already covers zero-measurement communes via `"indisponible"` fiches. `index.json` with sensible `nb_communes_scorees`/`nb_communes_sans_donnees` counts, and Paris's fiche (`75056`) showing a `statut_donnees: "complet"` with scores that look plausible (not `null`, not obviously wrong given what's publicly known about Paris tap water — e.g. a "durete_calcaire" note reflecting genuinely hard water).
 
 - [ ] **Step 4: Decide on committing the output**
 
