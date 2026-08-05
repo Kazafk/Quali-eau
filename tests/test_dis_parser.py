@@ -1,7 +1,7 @@
 import os
 from datetime import date
 
-from pipeline.dis_parser import normaliser_code_insee, parse_valeur_rqana, load_prelevements, load_udi_reseaux
+from pipeline.dis_parser import normaliser_code_insee, parse_valeur_rqana, load_prelevements, load_udi_reseaux, iter_mesures
 
 
 def test_normaliser_code_insee_paris_arrondissement():
@@ -88,3 +88,43 @@ def test_load_udi_reseaux_commune_multi_reseaux_normalise_plm():
     assert len(reseaux) == 2
     codes = {r.code_reseau for r in reseaux}
     assert codes == {"075000221", "075000999"}
+
+
+def test_iter_mesures_valeur_quantifiee():
+    prelevements = load_prelevements(os.path.join(FIXTURES_DIR, "DIS_PLV_sample.txt"))
+    resultats = list(iter_mesures(os.path.join(FIXTURES_DIR, "DIS_RESULT_sample.txt"), prelevements))
+    nitrates = [(insee, m) for insee, code, m in resultats if code == "1340"]
+    assert len(nitrates) == 2  # REF-001 et REF-002 (REF-999 exclu, pas de jointure PLV)
+    insee, mesure = nitrates[0]
+    assert insee == "34116"
+    assert mesure.valeur == 14.0
+    assert mesure.sous_lq is False
+    assert mesure.date_prelevement == date(2026, 2, 10)
+
+
+def test_iter_mesures_sous_lq_lit_rqana_pas_valtraduite():
+    # BUG POTENTIEL évité : valtraduite="0.000000" pour ce glyphosate sous LQ.
+    # Si le parseur lisait valtraduite au lieu de rqana, on obtiendrait
+    # (valeur=0.0, sous_lq=False) au lieu de (0.020, True) — silencieusement faux.
+    prelevements = load_prelevements(os.path.join(FIXTURES_DIR, "DIS_PLV_sample.txt"))
+    resultats = list(iter_mesures(os.path.join(FIXTURES_DIR, "DIS_RESULT_sample.txt"), prelevements))
+    glyphosate = [(insee, m) for insee, code, m in resultats if code == "1506"]
+    assert len(glyphosate) == 1
+    _, mesure = glyphosate[0]
+    assert mesure.sous_lq is True
+    assert abs(mesure.valeur - 0.020) < 1e-9
+
+
+def test_iter_mesures_ignore_referenceprel_inconnu():
+    prelevements = load_prelevements(os.path.join(FIXTURES_DIR, "DIS_PLV_sample.txt"))
+    resultats = list(iter_mesures(os.path.join(FIXTURES_DIR, "DIS_RESULT_sample.txt"), prelevements))
+    # 5 lignes dans la fixture (REF-001 x2, REF-002, REF-999, ligne sans cdparametre) ;
+    # REF-999 (pas de jointure PLV) et la ligne sans cdparametre doivent être exclues.
+    assert len(resultats) == 3  # 2 nitrates (REF-001, REF-002) + 1 glyphosate (REF-001)
+
+
+def test_iter_mesures_ignore_ligne_sans_code_parametre():
+    prelevements = load_prelevements(os.path.join(FIXTURES_DIR, "DIS_PLV_sample.txt"))
+    resultats = list(iter_mesures(os.path.join(FIXTURES_DIR, "DIS_RESULT_sample.txt"), prelevements))
+    codes = {code for _, code, _ in resultats}
+    assert "" not in codes

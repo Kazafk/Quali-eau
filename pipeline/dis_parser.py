@@ -102,3 +102,33 @@ def load_udi_reseaux(udi_path: str) -> dict[str, list["ReseauRef"]]:
                 continue
             index.setdefault(insee, []).append(ReseauRef(code_reseau=code_reseau, nom_reseau=nom_reseau))
     return index
+
+
+def iter_mesures(result_path: str, prelevements: dict[str, "PrelevementInfo"]):
+    """Parse DIS_RESULT_*.txt (§2.1) en flux (générateur, pas de chargement
+    intégral en mémoire — ces fichiers pèsent plusieurs centaines de Mo).
+    Jointure via referenceprel. Yield (code_insee, code_parametre, Mesure).
+
+    Ignore (§2.1) : lignes sans referenceprel connu dans `prelevements`,
+    lignes sans cdparametre (lignes de conclusion/résiduelles), lignes
+    dont rqana est vide ou non parseable.
+    """
+    with open(result_path, encoding="utf-8", errors="replace", newline="") as f:
+        reader = csv.DictReader(f, delimiter=",")
+        for row in reader:
+            ref = row.get("referenceprel", "").strip()
+            info = prelevements.get(ref)
+            if info is None:
+                continue
+            code_parametre = row.get("cdparametre", "").strip()
+            if not code_parametre:
+                continue
+            rqana = row.get("rqana", "").strip()
+            if not rqana:
+                continue
+            try:
+                valeur, sous_lq = parse_valeur_rqana(rqana)
+            except ValueError:
+                continue
+            mesure = Mesure(valeur=valeur, sous_lq=sous_lq, date_prelevement=info.date_prelevement)
+            yield info.code_insee, code_parametre, mesure
