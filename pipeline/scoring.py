@@ -40,12 +40,12 @@ def score_pfas(valeur: float) -> float:
     return min(30.0, 60.0 * 0.10 / valeur)
 
 
-def score_metal(valeur: float, rq: float, lq: float) -> float:
-    """§3.1.1 P_métaux, pour un métal donné (Pb/As/Cd/Ni)."""
-    if valeur <= rq:
-        return 100.0
+def score_metal_toxique(valeur: float, lq: float) -> float:
+    """§3.1.1 P_métaux, pour un métal donné (Pb/As/Cd/Ni). Seuil unique sur LQ
+    (correctif v1.5) : aucune référence de qualité (RQ) n'est documentée pour
+    ces métaux toxiques, contrairement au cuivre (§3.2.4, RQ/LQ explicites)."""
     if valeur <= lq:
-        return 100.0 - (valeur - rq) / (lq - rq) * 30.0
+        return 100.0
     return max(0.0, 70.0 * lq / valeur)
 
 

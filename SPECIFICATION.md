@@ -1,6 +1,6 @@
 # Spécification Technique & Fonctionnelle — Quali'eau
 
-> **Version :** 1.4.0 (format réel des fichiers DIS vérifié sur données réelles — 05/08/2026)
+> **Version :** 1.5.0 (correctif P_métaux : suppression de la RQ non documentée pour Pb/As/Cd/Ni — 05/08/2026)
 > **Statut :** En cours de cadrage — spécification de référence
 > **Projet :** Quali'eau (même squelette technique que *SCA Water Map* et *Pesticides Water Map*)
 > **Sources de données :** Exports data.gouv.fr du contrôle sanitaire SISE-EAUX (batch hebdomadaire) ; API Hub'eau *Qualité de l'eau potable* (développement & tests)
@@ -199,10 +199,10 @@ $$S_{\text{sécurité}} = \min(P_{\text{bact}}, P_{\text{pest}}, P_{\text{pfas}}
   * < 0,02 µg/L : $100$.
   * 0,02 à 0,10 µg/L : note linéaire de $90$ à $60$.
   * > 0,10 µg/L : $60 \times \frac{0{,}10}{\text{valeur}}$, plafonnée à 30.
-* **Métaux Lourds & Toxiques ($P_{\text{métaux}}$)** — Pb, As, Cd, Ni évalués contre leur limite (LQ) et référence (RQ) de qualité, puis $P_{\text{métaux}} = \min_i(\text{note}_i)$ :
-  * $v \le RQ$ : $100$.
-  * $RQ < v \le LQ$ : interpolation linéaire de $100$ (à RQ) à $70$ (à LQ).
+* **Métaux Lourds & Toxiques ($P_{\text{métaux}}$)** — Pb, As, Cd, Ni évalués contre leur seule limite de qualité (LQ) réglementaire, puis $P_{\text{métaux}} = \min_i(\text{note}_i)$ :
+  * $v \le LQ$ : $100$.
   * $v > LQ$ : $70 \times \frac{LQ}{v}$ (plancher 0).
+  * *Correction v1.5 :* la v1.0–v1.3 imposait une interpolation à deux paliers RQ→LQ pour ces quatre métaux, mais aucune valeur de RQ n'a jamais été documentée pour eux en §2.3 (contrairement au cuivre, `1392`, qui est un paramètre de confort avec RQ=1/LQ=2 mg/L explicites en §3.2.4) — ces métaux toxiques n'ont pas de « référence de qualité » distincte en droit français, seulement une limite de qualité. Le barème est donc aligné sur le même principe à seuil unique que $P_{\text{pest}}$/$P_{\text{pfas}}$.
 * **Nitrates & Nitrites ($P_{\text{nitrates}}$, ajouté en v1.3)** — évalués contre leur limite de qualité réglementaire respective (nitrates `1340` : 50 mg/L ; nitrites `1339` : 0,1 mg/L), indépendamment du barème gustatif $N_{\text{nitrates}}$ de $S_{\text{minéraux}}$ (§3.1.2, qui grade le confort à basse concentration et non le dépassement réglementaire) :
   * nitrates ≤ 50 mg/L **et** nitrites ≤ 0,1 mg/L : $100$.
   * nitrates > 50 mg/L : $50 \times \frac{50}{\text{valeur}}$, plancher 0.
@@ -696,6 +696,9 @@ def estimate_cost(param_code: str, value: float) -> dict | None:
 ---
 
 ## 9. Changelog
+
+### v1.5.0 — 05/08/2026 (correctif P_métaux)
+* **§3.1.1 corrigée** : le barème RQ→LQ à deux paliers pour Pb/As/Cd/Ni est remplacé par un seuil unique sur LQ (`v ≤ LQ : 100`, `v > LQ : 70×LQ/v`), aligné sur le principe déjà utilisé pour `P_pest`/`P_pfas`. Aucune valeur de RQ n'avait jamais été documentée en §2.3 pour ces quatre métaux — seul le cuivre (`1392`, paramètre de confort en §3.2.4) a une RQ explicite. Corrige en même temps `pipeline/scoring.py` (`score_metal` → `score_metal_toxique(valeur, lq)`), livré dans le plan précédent sur la prémisse RQ erronée.
 
 ### v1.4.0 — 05/08/2026 (format réel des fichiers DIS)
 * **§2.1 corrigée avec les vrais noms de colonnes** des fichiers `DIS_PLV`/`DIS_RESULT`/`DIS_COM_UDI`, vérifiés directement sur `dis-2026.zip` (téléchargé par *Pesticides Water Map*) plutôt que déduits des noms de champs de l'API Hub'eau — les deux diffèrent (ex. `plvconformitebacterio` dans le batch vs `conformite_limites_bact_prelevement` dans l'API).

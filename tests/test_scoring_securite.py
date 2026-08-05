@@ -3,7 +3,7 @@ from pipeline.scoring import (
     score_bacteriologie,
     score_pesticides,
     score_pfas,
-    score_metal,
+    score_metal_toxique,
     score_nitrates_securite,
     score_securite,
 )
@@ -66,18 +66,19 @@ def test_pfas_depassement_plafonne():
     assert abs(score_pfas(0.15) - 30.0) < 1e-9
 
 
-def test_metal_conforme():
-    assert score_metal(valeur=0.5, rq=1.0, lq=2.0) == 100.0
+def test_metal_toxique_conforme():
+    assert score_metal_toxique(valeur=5.0, lq=10.0) == 100.0
+    assert score_metal_toxique(valeur=10.0, lq=10.0) == 100.0  # borne incluse
 
 
-def test_metal_interpolation():
-    # RQ=1, LQ=2 : à mi-chemin (1.5) -> 100 - 0.5/1.0*30 = 85
-    assert abs(score_metal(valeur=1.5, rq=1.0, lq=2.0) - 85.0) < 1e-9
+def test_metal_toxique_depassement():
+    # LQ=10, valeur=20 -> 70 * 10/20 = 35
+    assert abs(score_metal_toxique(valeur=20.0, lq=10.0) - 35.0) < 1e-9
 
 
-def test_metal_depassement():
-    # LQ=2, valeur=4 -> 70 * 2/4 = 35
-    assert abs(score_metal(valeur=4.0, rq=1.0, lq=2.0) - 35.0) < 1e-9
+def test_metal_toxique_plancher_zero():
+    # valeur très élevée -> tend vers 0, jamais négatif
+    assert score_metal_toxique(valeur=10000.0, lq=10.0) >= 0.0
 
 
 def test_nitrates_securite_conforme():
