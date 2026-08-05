@@ -79,3 +79,26 @@ def load_prelevements(plv_path: str) -> dict[str, PrelevementInfo]:
                 conforme_chimique=_parse_conformite(row.get("plvconformitechimique", "")),
             )
     return index
+
+
+@dataclass
+class ReseauRef:
+    code_reseau: str
+    nom_reseau: str
+
+
+def load_udi_reseaux(udi_path: str) -> dict[str, list["ReseauRef"]]:
+    """Parse DIS_COM_UDI_*.txt (§2.1) en index code_insee -> réseaux (§2.5.4).
+    Applique la normalisation PLM : les réseaux des différents arrondissements
+    d'une même ville PLM se regroupent sous le code commune parent."""
+    index: dict[str, list[ReseauRef]] = {}
+    with open(udi_path, encoding="utf-8", errors="replace", newline="") as f:
+        reader = csv.DictReader(f, delimiter=",")
+        for row in reader:
+            insee = normaliser_code_insee(row.get("inseecommune", "").strip())
+            code_reseau = row.get("cdreseau", "").strip()
+            nom_reseau = row.get("nomreseau", "").strip()
+            if not insee or not code_reseau:
+                continue
+            index.setdefault(insee, []).append(ReseauRef(code_reseau=code_reseau, nom_reseau=nom_reseau))
+    return index

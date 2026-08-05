@@ -1,7 +1,7 @@
 import os
 from datetime import date
 
-from pipeline.dis_parser import normaliser_code_insee, parse_valeur_rqana, load_prelevements
+from pipeline.dis_parser import normaliser_code_insee, parse_valeur_rqana, load_prelevements, load_udi_reseaux
 
 
 def test_normaliser_code_insee_paris_arrondissement():
@@ -70,3 +70,21 @@ def test_load_prelevements_normalise_plm():
 def test_load_prelevements_conformite_non_conforme():
     idx = load_prelevements(os.path.join(FIXTURES_DIR, "DIS_PLV_sample.txt"))
     assert idx["REF-003"].conforme_bacterio is False
+
+
+def test_load_udi_reseaux_commune_simple():
+    idx = load_udi_reseaux(os.path.join(FIXTURES_DIR, "DIS_COM_UDI_sample.txt"))
+    reseaux = idx["34116"]
+    assert len(reseaux) == 1
+    assert reseaux[0].code_reseau == "034000123"
+    assert reseaux[0].nom_reseau == "RESEAU GRABELS PRINCIPAL"
+
+
+def test_load_udi_reseaux_commune_multi_reseaux_normalise_plm():
+    # Paris 1er (75101) -> normalisé vers 75056, les deux réseaux du même
+    # arrondissement doivent se regrouper sous 75056 (§2.5.4)
+    idx = load_udi_reseaux(os.path.join(FIXTURES_DIR, "DIS_COM_UDI_sample.txt"))
+    reseaux = idx["75056"]
+    assert len(reseaux) == 2
+    codes = {r.code_reseau for r in reseaux}
+    assert codes == {"075000221", "075000999"}
