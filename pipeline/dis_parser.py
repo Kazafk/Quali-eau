@@ -39,3 +39,43 @@ def parse_valeur_rqana(rqana: str) -> tuple[float, bool]:
         brut = brut[1:]
     valeur = float(brut.replace(",", "."))
     return valeur, sous_lq
+
+
+@dataclass
+class PrelevementInfo:
+    code_insee: str
+    code_reseau: str
+    date_prelevement: date
+    conforme_bacterio: bool | None
+    conforme_chimique: bool | None
+
+
+def _parse_conformite(valeur: str) -> bool | None:
+    v = valeur.strip()
+    if v == "C":
+        return True
+    if v == "N":
+        return False
+    return None
+
+
+def load_prelevements(plv_path: str) -> dict[str, PrelevementInfo]:
+    """Parse DIS_PLV_*.txt (§2.1) en index referenceprel -> PrelevementInfo.
+    Applique la normalisation PLM (§2.5.5) sur inseecommuneprinc."""
+    index: dict[str, PrelevementInfo] = {}
+    with open(plv_path, encoding="utf-8", errors="replace", newline="") as f:
+        reader = csv.DictReader(f, delimiter=",")
+        for row in reader:
+            ref = row.get("referenceprel", "").strip()
+            insee = row.get("inseecommuneprinc", "").strip()
+            date_str = row.get("dateprel", "").strip()
+            if not ref or not insee or not date_str:
+                continue
+            index[ref] = PrelevementInfo(
+                code_insee=normaliser_code_insee(insee),
+                code_reseau=row.get("cdreseau", "").strip(),
+                date_prelevement=date.fromisoformat(date_str[:10]),
+                conforme_bacterio=_parse_conformite(row.get("plvconformitebacterio", "")),
+                conforme_chimique=_parse_conformite(row.get("plvconformitechimique", "")),
+            )
+    return index

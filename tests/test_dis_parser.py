@@ -1,4 +1,7 @@
-from pipeline.dis_parser import normaliser_code_insee, parse_valeur_rqana
+import os
+from datetime import date
+
+from pipeline.dis_parser import normaliser_code_insee, parse_valeur_rqana, load_prelevements
 
 
 def test_normaliser_code_insee_paris_arrondissement():
@@ -41,3 +44,29 @@ def test_parse_valeur_rqana_entier_sans_virgule():
     valeur, sous_lq = parse_valeur_rqana("14")
     assert sous_lq is False
     assert valeur == 14.0
+
+
+FIXTURES_DIR = os.path.join(os.path.dirname(__file__), "fixtures")
+
+
+def test_load_prelevements_parse_champs_reels():
+    idx = load_prelevements(os.path.join(FIXTURES_DIR, "DIS_PLV_sample.txt"))
+    assert len(idx) == 4
+    info = idx["REF-001"]
+    assert info.code_insee == "34116"
+    assert info.code_reseau == "034000123"
+    assert info.date_prelevement == date(2026, 2, 10)
+    assert info.conforme_bacterio is True
+    assert info.conforme_chimique is True
+
+
+def test_load_prelevements_normalise_plm():
+    # REF-003/REF-004 sont sur Paris 1er (75101) -> doit remonter à 75056
+    idx = load_prelevements(os.path.join(FIXTURES_DIR, "DIS_PLV_sample.txt"))
+    assert idx["REF-003"].code_insee == "75056"
+    assert idx["REF-004"].code_insee == "75056"
+
+
+def test_load_prelevements_conformite_non_conforme():
+    idx = load_prelevements(os.path.join(FIXTURES_DIR, "DIS_PLV_sample.txt"))
+    assert idx["REF-003"].conforme_bacterio is False

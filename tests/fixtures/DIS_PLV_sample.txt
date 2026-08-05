@@ -1,0 +1,5 @@
+cddept,cdreseau,inseecommuneprinc,nomcommuneprinc,cdreseauamont,nomreseauamont,pourcentdebit,referenceprel,dateprel,heureprel,conclusionprel,ugelib,distrlib,moalib,plvconformitebacterio,plvconformitechimique,plvconformitereferencebact,plvconformitereferencechim
+"034","034000123","34116","GRABELS","","","","REF-001","2026-02-10","09h00","Eau conforme.","UGE TEST","DISTR TEST","MOA TEST","C","C","C","C"
+"034","034000123","34116","GRABELS","","","","REF-002","2026-05-15","10h30","Eau conforme.","UGE TEST","DISTR TEST","MOA TEST","C","C","C","C"
+"075","075000221","75101","PARIS 1ER ARRONDISSEMENT","","","","REF-003","2026-03-01","08h00","Eau conforme.","EAU DE PARIS","EAU DE PARIS","EAU DE PARIS","N","C","C","C"
+"075","075000221","75101","PARIS 1ER ARRONDISSEMENT","","","","REF-004","2026-06-01","08h00","Eau conforme.","EAU DE PARIS","EAU DE PARIS","EAU DE PARIS","C","C","C","C"
