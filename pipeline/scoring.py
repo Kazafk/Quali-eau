@@ -180,7 +180,7 @@ def score_durete(th: float) -> float:
 
 def score_chlore_cosmetique(valeur: float) -> float:
     """§3.2.2 S_chlore (chlore total 1399, même barème que N_chlore boisson)."""
-    if valeur <= 0.05:
+    if valeur < 0.05:
         return 100.0
     if valeur <= 0.15:
         return 80.0
@@ -234,12 +234,22 @@ def score_metaux_depots(cu: float, fe: float, mn: float) -> float:
     return min(score_cuivre(cu), score_fer(fe), score_manganese(mn))
 
 
-def score_cosmetique(th: float, chlore_total: float, ph: float, cu: float, fe: float, mn: float) -> int:
+def score_cosmetique(th: float, chlore_total: float, ph: float, cu: float, fe: float, mn: float) -> tuple[int, dict]:
     """§3.2 S_cosmetique = 0.45*S_durete + 0.25*S_chlore + 0.15*S_pH + 0.15*S_metaux_depots.
-    Les sous-scores sont arrondis avant combinaison (convention de l'exemple §5.3)."""
+    Les sous-scores sont arrondis avant combinaison (convention de l'exemple §5.3).
+    Retourne (score, sous_scores) — sous_scores expose les 4 clés attendues par
+    le contrat de fiche communale §5.3, pour que l'appelant n'ait pas à
+    recalculer/dupliquer la convention d'arrondi hors de ce module."""
     s_durete = arrondi(score_durete(th))
     s_chlore = arrondi(score_chlore_cosmetique(chlore_total))
     s_ph = arrondi(score_ph(ph))
     s_metaux = arrondi(score_metaux_depots(cu, fe, mn))
     brut = 0.45 * s_durete + 0.25 * s_chlore + 0.15 * s_ph + 0.15 * s_metaux
-    return arrondi(max(0.0, min(100.0, brut)))
+    score = arrondi(max(0.0, min(100.0, brut)))
+    sous_scores = {
+        "durete_calcaire": s_durete,
+        "chlore_agressivite": s_chlore,
+        "respect_ph": s_ph,
+        "metaux_depots": s_metaux,
+    }
+    return score, sous_scores

@@ -1,4 +1,4 @@
-from pipeline.cost_estimate import estimate_cost
+from pipeline.cost_estimate import estimate_cost, VETO_THRESHOLDS
 
 
 def generate_recommendations(mesures: dict, bact_actif: bool) -> list[dict]:
@@ -23,6 +23,7 @@ def generate_recommendations(mesures: dict, bact_actif: bool) -> list[dict]:
     chlore_libre = mesures.get("1398")
     chlore_total = mesures.get("1399")
     nitrates = mesures.get("1340")
+    nitrites = mesures.get("1339")
     pesticide_total = mesures.get("6276", 0.0)
     pesticide_molecule_max = mesures.get("_pesticide_molecule_max", 0.0)
     pfas = mesures.get("8847", 0.0)
@@ -30,12 +31,13 @@ def generate_recommendations(mesures: dict, bact_actif: bool) -> list[dict]:
     cuivre = mesures.get("1392")
 
     if pesticide_total > 0.05 or pesticide_molecule_max > 0.1 or pfas > 0.02:
-        pollution_ratio_pest = pesticide_total / 0.5
-        pollution_ratio_pfas = pfas / 0.1
-        if pollution_ratio_pest >= pollution_ratio_pfas:
-            code_ref, valeur_ref = "6276", pesticide_total
-        else:
-            code_ref, valeur_ref = "8847", pfas
+        candidats = [
+            ("6276", pesticide_total, pesticide_total / VETO_THRESHOLDS["6276"]),
+            ("_pesticide_molecule_max", pesticide_molecule_max,
+             pesticide_molecule_max / VETO_THRESHOLDS["_pesticide_molecule_max"]),
+            ("8847", pfas, pfas / VETO_THRESHOLDS["8847"]),
+        ]
+        code_ref, valeur_ref, _ = max(candidats, key=lambda c: c[2])
         reco = {
             "usage": "boisson",
             "type": "filtration_chimique",
@@ -61,6 +63,21 @@ def generate_recommendations(mesures: dict, bact_actif: bool) -> list[dict]:
             ),
         }
         cout = estimate_cost("1340", nitrates)
+        if cout:
+            reco["estimation_cout"] = cout
+        recos.append(reco)
+
+    if nitrites is not None and nitrites > 0.1:
+        reco = {
+            "usage": "boisson",
+            "type": "nitrites_alerte",
+            "titre": "Dépassement nitrites",
+            "description": (
+                "Teneur en nitrites au-dessus de la limite de qualité réglementaire "
+                "(0,1 mg/L) — traitement par osmose inverse recommandé."
+            ),
+        }
+        cout = estimate_cost("1339", nitrites)
         if cout:
             reco["estimation_cout"] = cout
         recos.append(reco)

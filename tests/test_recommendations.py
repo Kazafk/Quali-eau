@@ -48,3 +48,48 @@ def test_recommandations_eau_parfaite_liste_vide():
         "6276": 0.0, "8847": 0.0, "_pesticide_molecule_max": 0.0,
     }
     assert generate_recommendations(mesures, bact_actif=False) == []
+
+
+def test_recommandations_molecule_pesticide_domine_la_severite():
+    # BUG CRITIQUE (revue finale) : avant le correctif, seuls pesticide_total et
+    # pfas étaient comparés pour choisir la sévérité — une molécule individuelle
+    # 5x au-dessus de sa limite (0.1 µg/L) avec un total/PFAS bas ne produisait
+    # qu'une recommandation "modere" (filtre à charbon, 80-120€) alors que
+    # veto_sanitaire() classe ce cas en "extreme".
+    mesures = {
+        "1345": 5.0,
+        "6276": 0.02,
+        "8847": 0.005,
+        "_pesticide_molecule_max": 0.5,
+    }
+    recos = generate_recommendations(mesures, bact_actif=False)
+    filtration = next(r for r in recos if r["type"] == "filtration_chimique")
+    assert filtration["estimation_cout"]["niveau_severite"] == "extreme"
+
+
+def test_recommandations_nitrites_declenche_alerte():
+    mesures = {"1345": 5.0, "1339": 0.3}
+    recos = generate_recommendations(mesures, bact_actif=False)
+    nitrites_reco = next(r for r in recos if r["type"] == "nitrites_alerte")
+    assert nitrites_reco["estimation_cout"]["niveau_severite"] == "extreme"
+
+
+def test_recommandations_nitrates_biberons():
+    mesures = {"1345": 5.0, "1340": 30.0}
+    recos = generate_recommendations(mesures, bact_actif=False)
+    reco = next(r for r in recos if r["type"] == "nitrates_biberons")
+    assert reco["usage"] == "boisson"
+
+
+def test_recommandations_pommeau_filtrant():
+    mesures = {"1345": 5.0, "1399": 0.25}
+    recos = generate_recommendations(mesures, bact_actif=False)
+    reco = next(r for r in recos if r["type"] == "pommeau_filtrant")
+    assert reco["usage"] == "cosmetique"
+
+
+def test_recommandations_metaux_traces():
+    mesures = {"1345": 5.0, "1393": 300.0}
+    recos = generate_recommendations(mesures, bact_actif=False)
+    reco = next(r for r in recos if r["type"] == "metaux_traces")
+    assert reco["usage"] == "cosmetique"

@@ -6,6 +6,7 @@ VETO_THRESHOLDS = {
     "1339": 0.1,    # Nitrites, mg/L
     "6276": 0.5,    # Pesticides total, µg/L
     "8847": 0.1,    # PFAS total, µg/L
+    "_pesticide_molecule_max": 0.1,  # Pesticide individuel le plus élevé, µg/L (§3.1 veto)
 }
 
 
@@ -42,7 +43,7 @@ def estimate_cost(param_code: str, value: float) -> dict | None:
     if seuil_veto is None:
         return None
     ratio = value / seuil_veto
-    if ratio >= 1.0:  # seuil de veto sanitaire atteint (§3.1)
+    if ratio > 1.0:  # seuil de veto sanitaire dépassé (§3.1) — aligné sur le > strict de veto_sanitaire
         return {
             "materiel": "Osmoseur à pompe de perméat + reminéralisation",
             "achat_eur": "450-700",

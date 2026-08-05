@@ -74,5 +74,17 @@ def test_metaux_depots_est_le_minimum():
 def test_score_cosmetique_exemple_spec_paris():
     # Reprend l'exemple de la fiche communale (§5.3) :
     # durete=59 (arrondi de 59.43), chlore=80, pH=100, metaux_depots=95 -> 76
-    resultat = score_cosmetique(th=30.19, chlore_total=0.12, ph=7.0, cu=0.08, fe=62.5, mn=5.0)
-    assert resultat == 76
+    score, sous_scores = score_cosmetique(th=30.19, chlore_total=0.12, ph=7.0, cu=0.08, fe=62.5, mn=5.0)
+    assert score == 76
+    assert sous_scores == {
+        "durete_calcaire": 59,
+        "chlore_agressivite": 80,
+        "respect_ph": 100,
+        "metaux_depots": 95,
+    }
+
+
+def test_chlore_cosmetique_borne_0_05_alignee_sur_boisson():
+    from pipeline.scoring import score_chlore_gout
+    # A 0.05 mg/L pile, les deux fonctions doivent maintenant s'accorder (80, pas 100)
+    assert score_chlore_cosmetique(0.05) == score_chlore_gout(0.05) == 80.0

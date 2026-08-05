@@ -55,3 +55,16 @@ def test_pfas_palier_eleve_borne():
 
 def test_code_inconnu_retourne_none():
     assert estimate_cost("9999", 42.0) is None
+
+
+def test_nitrates_ratio_exactement_un_nest_plus_extreme():
+    # A la valeur pile du seuil (nitrates=50.0, ratio=1.0 exactement), le veto
+    # sanitaire ne se déclenche pas (> strict) donc le palier de coût ne doit
+    # plus non plus être "extreme" à cette valeur pile.
+    resultat = estimate_cost("1340", 50.0)
+    assert resultat["niveau_severite"] == "eleve"
+
+
+def test_nitrates_ratio_juste_au_dessus_est_extreme():
+    resultat = estimate_cost("1340", 50.01)
+    assert resultat["niveau_severite"] == "extreme"
