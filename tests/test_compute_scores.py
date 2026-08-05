@@ -139,3 +139,27 @@ def test_calculer_fiche_commune_aucune_mesure_statut_indisponible():
     fiche = calculer_fiche_commune("99999", {}, [], date(2026, 6, 15))
     assert fiche["statut_donnees"] == "indisponible"
     assert fiche["scores"] is None
+
+
+import os
+
+from pipeline.dis_parser import load_prelevements, load_udi_reseaux
+from pipeline.compute_scores import construire_fiches
+
+FIXTURES_DIR = os.path.join(os.path.dirname(__file__), "fixtures")
+
+
+def test_construire_fiches_depuis_fixtures_reelles():
+    # Bout-en-bout : PLV + RESULT + UDI (fixtures Tasks 3-5) -> fiches multi-communes
+    date_ref = date(2026, 8, 5)
+    fiches = construire_fiches(
+        plv_path=os.path.join(FIXTURES_DIR, "DIS_PLV_sample.txt"),
+        result_path=os.path.join(FIXTURES_DIR, "DIS_RESULT_sample.txt"),
+        udi_path=os.path.join(FIXTURES_DIR, "DIS_COM_UDI_sample.txt"),
+        date_reference=date_ref,
+    )
+    assert "34116" in fiches
+    fiche = fiches["34116"]
+    assert fiche["statut_donnees"] == "complet"
+    # nitrates moyens ~ (14+17)/2-ish pondéré, bien en dessous de 50 -> pas de veto
+    assert fiche["scores"]["boisson"]["veto_sanitaire"] is False

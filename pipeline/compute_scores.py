@@ -1,7 +1,9 @@
 """Orchestrateur : fenêtre temporelle, résolution réseau/PLM, puis calcul
 complet de la fiche communale (§5.3) via le moteur de scoring déjà testé
 (pipeline.scoring / pipeline.aggregation / pipeline.recommendations)."""
-from datetime import date
+import json
+import os
+from datetime import date, datetime, timezone
 
 from pipeline.models import ConclusionBacterio
 
@@ -189,3 +191,69 @@ def calculer_fiche_commune(code_insee: str, mesures_par_parametre: dict,
         },
         "recommandations": recommandations,
     }
+
+
+from pipeline.dis_parser import load_prelevements, load_udi_reseaux, iter_mesures
+
+
+def construire_fiches(plv_path: str, result_path: str, udi_path: str, date_reference: date) -> dict:
+    """Charge PLV+RESULT+UDI et construit la fiche de chaque commune connue.
+    Le réseau principal (§2.5.4) n'est pas encore filtré ici : toutes les
+    mesures de toutes les communes du fichier sont agrégées ensemble (une
+    commune multi-réseaux verra ses réseaux fusionnés — affinage laissé à
+    un futur plan si un cas réel l'exige)."""
+    prelevements = load_prelevements(plv_path)
+    _reseaux_par_commune = load_udi_reseaux(udi_path)  # réservé pour affinage futur
+
+    mesures_par_commune: dict = {}
+    for code_insee, code_parametre, mesure in iter_mesures(result_path, prelevements):
+        mesures_par_commune.setdefault(code_insee, {}).setdefault(code_parametre, []).append(mesure)
+
+    historique_bacterio_par_commune: dict = {}
+    for info in prelevements.values():
+        if info.conforme_bacterio is None:
+            continue
+        historique_bacterio_par_commune.setdefault(info.code_insee, []).append(
+            ConclusionBacterio(date_prelevement=info.date_prelevement, conforme=info.conforme_bacterio)
+        )
+
+    fiches = {}
+    for code_insee, mesures_par_parametre in mesures_par_commune.items():
+        historique = historique_bacterio_par_commune.get(code_insee, [])
+        fiches[code_insee] = calculer_fiche_commune(code_insee, mesures_par_parametre, historique, date_reference)
+    return fiches
+
+
+def main(raw_dir: str, output_dir: str, date_reference: date | None = None) -> None:
+    """Point d'entrée batch : lit les 3 fichiers DIS de `raw_dir` (année la
+    plus récente uniquement — l'agrégation multi-années glissantes est un
+    raffinement futur), écrit une fiche JSON par commune sous
+    `output_dir/communes/{code_insee}.json` + un `index.json` global."""
+    date_reference = date_reference or datetime.now(timezone.utc).date()
+    plv_path = os.path.join(raw_dir, "DIS_PLV.txt")
+    result_path = os.path.join(raw_dir, "DIS_RESULT.txt")
+    udi_path = os.path.join(raw_dir, "DIS_COM_UDI.txt")
+
+    fiches = construire_fiches(plv_path, result_path, udi_path, date_reference)
+
+    communes_dir = os.path.join(output_dir, "communes")
+    os.makedirs(communes_dir, exist_ok=True)
+    for code_insee, fiche in fiches.items():
+        with open(os.path.join(communes_dir, f"{code_insee}.json"), "w", encoding="utf-8") as f:
+            json.dump(fiche, f, ensure_ascii=False, indent=2)
+
+    index = {
+        "genere_le": datetime.now(timezone.utc).isoformat(),
+        "nb_communes_scorees": sum(1 for f in fiches.values() if f["statut_donnees"] == "complet"),
+        "nb_communes_sans_donnees": sum(1 for f in fiches.values() if f["statut_donnees"] == "indisponible"),
+    }
+    with open(os.path.join(output_dir, "index.json"), "w", encoding="utf-8") as f:
+        json.dump(index, f, ensure_ascii=False, indent=2)
+
+
+if __name__ == "__main__":
+    PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    main(
+        raw_dir=os.path.join(PROJECT_ROOT, "data", "raw", "2026"),
+        output_dir=os.path.join(PROJECT_ROOT, "public", "data"),
+    )
