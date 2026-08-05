@@ -1,0 +1,41 @@
+{
+  "commune": {
+    "code_insee": "63076"
+  },
+  "statut_donnees": "complet",
+  "scores": {
+    "donnees_partielles": true,
+    "boisson": {
+      "score": 84,
+      "veto_sanitaire": false,
+      "sous_scores": {
+        "securite_sanitaire": 70,
+        "mineraux_equilibre": 100,
+        "gout_organoleptique": 100
+      }
+    },
+    "cosmetique": {
+      "score": 76,
+      "sous_scores": {
+        "durete_calcaire": 85,
+        "chlore_agressivite": 100,
+        "respect_ph": 25,
+        "metaux_depots": 58
+      }
+    }
+  },
+  "recommandations": [
+    {
+      "usage": "boisson",
+      "type": "filtration_chimique",
+      "titre": "Filtration recommandée (pesticides/PFAS)",
+      "description": "Filtration sous évier (bloc charbon actif haute densité ou osmose inverse selon le niveau de dépassement).",
+      "estimation_cout": {
+        "materiel": "Osmoseur inverse basique (3 étages)",
+        "achat_eur": "200-300",
+        "entretien_annuel_eur": "60 (cartouches + membrane)",
+        "niveau_severite": "eleve"
+      }
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "commune": {
+    "code_insee": "58099"
+  },
+  "statut_donnees": "complet",
+  "scores": {
+    "donnees_partielles": true,
+    "boisson": {
+      "score": 94,
+      "veto_sanitaire": false,
+      "sous_scores": {
+        "securite_sanitaire": 100,
+        "mineraux_equilibre": 100,
+        "gout_organoleptique": 72
+      }
+    },
+    "cosmetique": {
+      "score": 88,
+      "sous_scores": {
+        "durete_calcaire": 85,
+        "chlore_agressivite": 100,
+        "respect_ph": 100,
+        "metaux_depots": 65
+      }
+    }
+  },
+  "recommandations": []
+}

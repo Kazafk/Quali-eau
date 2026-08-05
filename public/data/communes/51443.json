@@ -1,0 +1,71 @@
+{
+  "commune": {
+    "code_insee": "51443"
+  },
+  "statut_donnees": "complet",
+  "scores": {
+    "donnees_partielles": true,
+    "boisson": {
+      "score": 43,
+      "veto_sanitaire": true,
+      "sous_scores": {
+        "securite_sanitaire": 43,
+        "mineraux_equilibre": 30,
+        "gout_organoleptique": 88
+      }
+    },
+    "cosmetique": {
+      "score": 71,
+      "sous_scores": {
+        "durete_calcaire": 57,
+        "chlore_agressivite": 80,
+        "respect_ph": 100,
+        "metaux_depots": null
+      }
+    }
+  },
+  "recommandations": [
+    {
+      "usage": "boisson",
+      "type": "filtration_chimique",
+      "titre": "Filtration recommandée (pesticides/PFAS)",
+      "description": "Filtration sous évier (bloc charbon actif haute densité ou osmose inverse selon le niveau de dépassement).",
+      "estimation_cout": {
+        "materiel": "Filtre sous-évier à charbon actif",
+        "achat_eur": "80-120",
+        "entretien_annuel_eur": "30 (1 cartouche/an)",
+        "niveau_severite": "modere"
+      }
+    },
+    {
+      "usage": "boisson",
+      "type": "nitrates_biberons",
+      "titre": "Précaution nourrissons",
+      "description": "Éviter pour les biberons (< 15 mg/L conseillé). Osmoseur recommandé si > 40 mg/L.",
+      "estimation_cout": {
+        "materiel": "Osmoseur à pompe de perméat + reminéralisation",
+        "achat_eur": "450-700",
+        "entretien_annuel_eur": "90 (membrane 0,0001 µm saturée plus vite)",
+        "niveau_severite": "extreme"
+      }
+    },
+    {
+      "usage": "cosmetique",
+      "type": "adoucisseur",
+      "titre": "Dimensionner un adoucisseur adapté",
+      "description": "TH de 31.10 °fH : un équipement dimensionné à ce niveau de dureté limite les régénérations trop fréquentes.",
+      "estimation_cout": {
+        "materiel": "Adoucisseur renforcé (20-25 L)",
+        "achat_eur": "1200-1600",
+        "entretien_annuel_eur": "50-70 (4-5 sacs de sel/an)",
+        "niveau_severite": "eleve"
+      }
+    },
+    {
+      "usage": "boisson",
+      "type": "carafe",
+      "titre": "Optimiser le goût de l'eau",
+      "description": "Laissez reposer l'eau 20 minutes au frais en carafe ouverte pour éliminer le chlore avant dégustation."
+    }
+  ]
+}

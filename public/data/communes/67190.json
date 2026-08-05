@@ -1,0 +1,28 @@
+{
+  "commune": {
+    "code_insee": "67190"
+  },
+  "statut_donnees": "complet",
+  "scores": {
+    "donnees_partielles": true,
+    "boisson": {
+      "score": 98,
+      "veto_sanitaire": false,
+      "sous_scores": {
+        "securite_sanitaire": 100,
+        "mineraux_equilibre": 100,
+        "gout_organoleptique": 88
+      }
+    },
+    "cosmetique": {
+      "score": 81,
+      "sous_scores": {
+        "durete_calcaire": 100,
+        "chlore_agressivite": 80,
+        "respect_ph": 25,
+        "metaux_depots": null
+      }
+    }
+  },
+  "recommandations": []
+}

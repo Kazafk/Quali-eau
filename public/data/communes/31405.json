@@ -1,0 +1,47 @@
+{
+  "commune": {
+    "code_insee": "31405"
+  },
+  "statut_donnees": "complet",
+  "scores": {
+    "donnees_partielles": true,
+    "boisson": {
+      "score": 98,
+      "veto_sanitaire": false,
+      "sous_scores": {
+        "securite_sanitaire": 100,
+        "mineraux_equilibre": 100,
+        "gout_organoleptique": 88
+      }
+    },
+    "cosmetique": {
+      "score": 65,
+      "sous_scores": {
+        "durete_calcaire": 51,
+        "chlore_agressivite": 80,
+        "respect_ph": 80,
+        "metaux_depots": null
+      }
+    }
+  },
+  "recommandations": [
+    {
+      "usage": "cosmetique",
+      "type": "adoucisseur",
+      "titre": "Dimensionner un adoucisseur adapté",
+      "description": "TH de 32.91 °fH : un équipement dimensionné à ce niveau de dureté limite les régénérations trop fréquentes.",
+      "estimation_cout": {
+        "materiel": "Adoucisseur renforcé (20-25 L)",
+        "achat_eur": "1200-1600",
+        "entretien_annuel_eur": "50-70 (4-5 sacs de sel/an)",
+        "niveau_severite": "eleve"
+      }
+    },
+    {
+      "usage": "boisson",
+      "type": "carafe",
+      "titre": "Optimiser le goût de l'eau",
+      "description": "Laissez reposer l'eau 20 minutes au frais en carafe ouverte pour éliminer le chlore avant dégustation."
+    }
+  ]
+}

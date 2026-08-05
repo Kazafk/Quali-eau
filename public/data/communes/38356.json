@@ -1,0 +1,28 @@
+{
+  "commune": {
+    "code_insee": "38356"
+  },
+  "statut_donnees": "complet",
+  "scores": {
+    "donnees_partielles": true,
+    "boisson": {
+      "score": 96,
+      "veto_sanitaire": false,
+      "sous_scores": {
+        "securite_sanitaire": 100,
+        "mineraux_equilibre": 90,
+        "gout_organoleptique": 92
+      }
+    },
+    "cosmetique": {
+      "score": 88,
+      "sous_scores": {
+        "durete_calcaire": 81,
+        "chlore_agressivite": 100,
+        "respect_ph": 80,
+        "metaux_depots": 100
+      }
+    }
+  },
+  "recommandations": []
+}

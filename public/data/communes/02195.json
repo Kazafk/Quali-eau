@@ -1,0 +1,65 @@
+{
+  "commune": {
+    "code_insee": "02195"
+  },
+  "statut_donnees": "complet",
+  "scores": {
+    "donnees_partielles": true,
+    "boisson": {
+      "score": 26,
+      "veto_sanitaire": true,
+      "sous_scores": {
+        "securite_sanitaire": 26,
+        "mineraux_equilibre": 95,
+        "gout_organoleptique": 44
+      }
+    },
+    "cosmetique": {
+      "score": 40,
+      "sous_scores": {
+        "durete_calcaire": 18,
+        "chlore_agressivite": 20,
+        "respect_ph": 80,
+        "metaux_depots": 100
+      }
+    }
+  },
+  "recommandations": [
+    {
+      "usage": "boisson",
+      "type": "filtration_chimique",
+      "titre": "Filtration recommandée (pesticides/PFAS)",
+      "description": "Filtration sous évier (bloc charbon actif haute densité ou osmose inverse selon le niveau de dépassement).",
+      "estimation_cout": {
+        "materiel": "Osmoseur à pompe de perméat + reminéralisation",
+        "achat_eur": "450-700",
+        "entretien_annuel_eur": "90 (membrane 0,0001 µm saturée plus vite)",
+        "niveau_severite": "extreme"
+      }
+    },
+    {
+      "usage": "cosmetique",
+      "type": "adoucisseur",
+      "titre": "Dimensionner un adoucisseur adapté",
+      "description": "TH de 44.11 °fH : un équipement dimensionné à ce niveau de dureté limite les régénérations trop fréquentes.",
+      "estimation_cout": {
+        "materiel": "Adoucisseur haute capacité (> 25 L)",
+        "achat_eur": "1600-2000",
+        "entretien_annuel_eur": "70-100 (8+ sacs de sel/an)",
+        "niveau_severite": "extreme"
+      }
+    },
+    {
+      "usage": "cosmetique",
+      "type": "pommeau_filtrant",
+      "titre": "Protéger la peau du chlore",
+      "description": "Pommeau de douche avec filtre KDF ou billes céramiques recommandé."
+    },
+    {
+      "usage": "boisson",
+      "type": "carafe",
+      "titre": "Optimiser le goût de l'eau",
+      "description": "Laissez reposer l'eau 20 minutes au frais en carafe ouverte pour éliminer le chlore avant dégustation."
+    }
+  ]
+}

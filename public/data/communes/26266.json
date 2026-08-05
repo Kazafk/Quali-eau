@@ -1,0 +1,28 @@
+{
+  "commune": {
+    "code_insee": "26266"
+  },
+  "statut_donnees": "complet",
+  "scores": {
+    "donnees_partielles": true,
+    "boisson": {
+      "score": 67,
+      "veto_sanitaire": false,
+      "sous_scores": {
+        "securite_sanitaire": 50,
+        "mineraux_equilibre": 100,
+        "gout_organoleptique": 72
+      }
+    },
+    "cosmetique": {
+      "score": 86,
+      "sous_scores": {
+        "durete_calcaire": 80,
+        "chlore_agressivite": 100,
+        "respect_ph": 80,
+        "metaux_depots": null
+      }
+    }
+  },
+  "recommandations": []
+}

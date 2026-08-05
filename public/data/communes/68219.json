@@ -1,0 +1,28 @@
+{
+  "commune": {
+    "code_insee": "68219"
+  },
+  "statut_donnees": "complet",
+  "scores": {
+    "donnees_partielles": true,
+    "boisson": {
+      "score": 100,
+      "veto_sanitaire": false,
+      "sous_scores": {
+        "securite_sanitaire": 100,
+        "mineraux_equilibre": 100,
+        "gout_organoleptique": 100
+      }
+    },
+    "cosmetique": {
+      "score": 96,
+      "sous_scores": {
+        "durete_calcaire": 100,
+        "chlore_agressivite": 100,
+        "respect_ph": 80,
+        "metaux_depots": null
+      }
+    }
+  },
+  "recommandations": []
+}

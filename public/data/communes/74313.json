@@ -1,0 +1,28 @@
+{
+  "commune": {
+    "code_insee": "74313"
+  },
+  "statut_donnees": "complet",
+  "scores": {
+    "donnees_partielles": true,
+    "boisson": {
+      "score": 96,
+      "veto_sanitaire": false,
+      "sous_scores": {
+        "securite_sanitaire": 100,
+        "mineraux_equilibre": 100,
+        "gout_organoleptique": 82
+      }
+    },
+    "cosmetique": {
+      "score": 86,
+      "sous_scores": {
+        "durete_calcaire": 84,
+        "chlore_agressivite": 100,
+        "respect_ph": 55,
+        "metaux_depots": 100
+      }
+    }
+  },
+  "recommandations": []
+}

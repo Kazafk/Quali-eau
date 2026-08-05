@@ -1,0 +1,65 @@
+{
+  "commune": {
+    "code_insee": "84014"
+  },
+  "statut_donnees": "complet",
+  "scores": {
+    "donnees_partielles": false,
+    "boisson": {
+      "score": 78,
+      "veto_sanitaire": false,
+      "sous_scores": {
+        "securite_sanitaire": 70,
+        "mineraux_equilibre": 100,
+        "gout_organoleptique": 70
+      }
+    },
+    "cosmetique": {
+      "score": 57,
+      "sous_scores": {
+        "durete_calcaire": 47,
+        "chlore_agressivite": 50,
+        "respect_ph": 55,
+        "metaux_depots": 100
+      }
+    }
+  },
+  "recommandations": [
+    {
+      "usage": "boisson",
+      "type": "filtration_chimique",
+      "titre": "Filtration recommandée (pesticides/PFAS)",
+      "description": "Filtration sous évier (bloc charbon actif haute densité ou osmose inverse selon le niveau de dépassement).",
+      "estimation_cout": {
+        "materiel": "Osmoseur inverse basique (3 étages)",
+        "achat_eur": "200-300",
+        "entretien_annuel_eur": "60 (cartouches + membrane)",
+        "niveau_severite": "eleve"
+      }
+    },
+    {
+      "usage": "cosmetique",
+      "type": "adoucisseur",
+      "titre": "Dimensionner un adoucisseur adapté",
+      "description": "TH de 34.42 °fH : un équipement dimensionné à ce niveau de dureté limite les régénérations trop fréquentes.",
+      "estimation_cout": {
+        "materiel": "Adoucisseur renforcé (20-25 L)",
+        "achat_eur": "1200-1600",
+        "entretien_annuel_eur": "50-70 (4-5 sacs de sel/an)",
+        "niveau_severite": "eleve"
+      }
+    },
+    {
+      "usage": "cosmetique",
+      "type": "pommeau_filtrant",
+      "titre": "Protéger la peau du chlore",
+      "description": "Pommeau de douche avec filtre KDF ou billes céramiques recommandé."
+    },
+    {
+      "usage": "boisson",
+      "type": "carafe",
+      "titre": "Optimiser le goût de l'eau",
+      "description": "Laissez reposer l'eau 20 minutes au frais en carafe ouverte pour éliminer le chlore avant dégustation."
+    }
+  ]
+}

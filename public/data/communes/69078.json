@@ -1,0 +1,28 @@
+{
+  "commune": {
+    "code_insee": "69078"
+  },
+  "statut_donnees": "complet",
+  "scores": {
+    "donnees_partielles": true,
+    "boisson": {
+      "score": 98,
+      "veto_sanitaire": false,
+      "sous_scores": {
+        "securite_sanitaire": 100,
+        "mineraux_equilibre": 90,
+        "gout_organoleptique": 100
+      }
+    },
+    "cosmetique": {
+      "score": 85,
+      "sous_scores": {
+        "durete_calcaire": 79,
+        "chlore_agressivite": 100,
+        "respect_ph": 80,
+        "metaux_depots": null
+      }
+    }
+  },
+  "recommandations": []
+}

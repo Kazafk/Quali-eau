@@ -1,0 +1,28 @@
+{
+  "commune": {
+    "code_insee": "43094"
+  },
+  "statut_donnees": "complet",
+  "scores": {
+    "donnees_partielles": true,
+    "boisson": {
+      "score": 69,
+      "veto_sanitaire": false,
+      "sous_scores": {
+        "securite_sanitaire": 50,
+        "mineraux_equilibre": 100,
+        "gout_organoleptique": 80
+      }
+    },
+    "cosmetique": {
+      "score": 84,
+      "sous_scores": {
+        "durete_calcaire": 85,
+        "chlore_agressivite": 80,
+        "respect_ph": 85,
+        "metaux_depots": null
+      }
+    }
+  },
+  "recommandations": []
+}

@@ -1,0 +1,28 @@
+{
+  "commune": {
+    "code_insee": "63058"
+  },
+  "statut_donnees": "complet",
+  "scores": {
+    "donnees_partielles": true,
+    "boisson": {
+      "score": 100,
+      "veto_sanitaire": false,
+      "sous_scores": {
+        "securite_sanitaire": 100,
+        "mineraux_equilibre": 100,
+        "gout_organoleptique": 100
+      }
+    },
+    "cosmetique": {
+      "score": 91,
+      "sous_scores": {
+        "durete_calcaire": null,
+        "chlore_agressivite": 80,
+        "respect_ph": 100,
+        "metaux_depots": 100
+      }
+    }
+  },
+  "recommandations": []
+}

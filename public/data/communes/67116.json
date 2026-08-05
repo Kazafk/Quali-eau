@@ -1,0 +1,53 @@
+{
+  "commune": {
+    "code_insee": "67116"
+  },
+  "statut_donnees": "complet",
+  "scores": {
+    "donnees_partielles": false,
+    "boisson": {
+      "score": 92,
+      "veto_sanitaire": false,
+      "sous_scores": {
+        "securite_sanitaire": 100,
+        "mineraux_equilibre": 90,
+        "gout_organoleptique": 70
+      }
+    },
+    "cosmetique": {
+      "score": 67,
+      "sous_scores": {
+        "durete_calcaire": 71,
+        "chlore_agressivite": 80,
+        "respect_ph": 80,
+        "metaux_depots": 20
+      }
+    }
+  },
+  "recommandations": [
+    {
+      "usage": "cosmetique",
+      "type": "adoucisseur",
+      "titre": "Dimensionner un adoucisseur adapté",
+      "description": "TH de 26.36 °fH : un équipement dimensionné à ce niveau de dureté limite les régénérations trop fréquentes.",
+      "estimation_cout": {
+        "materiel": "Adoucisseur renforcé (20-25 L)",
+        "achat_eur": "1200-1600",
+        "entretien_annuel_eur": "50-70 (4-5 sacs de sel/an)",
+        "niveau_severite": "eleve"
+      }
+    },
+    {
+      "usage": "boisson",
+      "type": "carafe",
+      "titre": "Optimiser le goût de l'eau",
+      "description": "Laissez reposer l'eau 20 minutes au frais en carafe ouverte pour éliminer le chlore avant dégustation."
+    },
+    {
+      "usage": "cosmetique",
+      "type": "metaux_traces",
+      "titre": "Fer/cuivre élevé",
+      "description": "Laissez couler l'eau 30 s le matin avant consommation ; masque capillaire chélatant pour cheveux clairs/décolorés."
+    }
+  ]
+}
