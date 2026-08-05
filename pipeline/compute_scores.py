@@ -91,6 +91,9 @@ CODES_CONSOMMES = set(PESTICIDE_CODES) | set(METAUX_LQ) | {
     "1345", "1399", "1302", "1392", "1393", "1394",
 }
 
+FENETRE_MAX_JOURS = 730  # borne haute de selectionner_fenetre_jours (§2.5.1) — une mesure
+                          # plus ancienne ne peut jamais entrer dans un calcul de score.
+
 
 def _moyenne_ou_zero(mesures: list, date_reference: date) -> float:
     if not mesures:
@@ -322,8 +325,7 @@ def calculer_fiche_commune(code_insee: str, mesures_par_parametre: dict,
 
 
 from pipeline.dis_parser import (
-    load_prelevements, load_udi_reseaux, iter_mesures,
-    charger_prelevements_multi, iter_mesures_multi,
+    load_udi_reseaux, charger_prelevements_multi, iter_mesures_multi,
 )
 
 
@@ -331,13 +333,21 @@ def construire_fiches(plv_paths: list[str], result_paths: list[str], udi_path: s
     """Charge PLV+RESULT (fusionnés sur plusieurs années, §2.1) + UDI
     (référentiel réseau, une seule année — la plus récente) et construit
     la fiche de CHAQUE commune connue, y compris celles sans aucune mesure
-    (§2.5.6 : fiche "indisponible", jamais une absence silencieuse)."""
+    (§2.5.6 : fiche "indisponible", jamais une absence silencieuse).
+
+    Note : une commune n'est considérée comme ayant des données "exploitables"
+    que si elle a au moins une mesure sur un paramètre de CODES_CONSOMMES —
+    une commune avec uniquement des résultats hors de cette liste (ex. seule
+    la microbiologie a été analysée) sera "indisponible" même si des données
+    brutes existent, cohérent avec le principe de renormalisation de §3."""
     prelevements = charger_prelevements_multi(plv_paths)
     reseaux_par_commune = load_udi_reseaux(udi_path)
 
     mesures_par_commune: dict = {}
     for code_insee, code_parametre, mesure in iter_mesures_multi(result_paths, prelevements):
         if code_parametre not in CODES_CONSOMMES:
+            continue
+        if not 0 <= (date_reference - mesure.date_prelevement).days <= FENETRE_MAX_JOURS:
             continue
         mesures_par_commune.setdefault(code_insee, {}).setdefault(code_parametre, []).append(mesure)
 
@@ -368,18 +378,21 @@ def _trouver_fichiers(raw_dir: str, motif: str) -> list[str]:
     raw_dir OU dans ses sous-répertoires annuels (data/raw/{annee}/...,
     layout réel produit par pipeline/download_data.py). Retourne une liste
     triée (donc chronologique pour des noms suffixés par année)."""
-    correspondances = sorted(glob.glob(os.path.join(raw_dir, motif)))
-    correspondances += sorted(glob.glob(os.path.join(raw_dir, "*", motif)))
+    correspondances = sorted(
+        glob.glob(os.path.join(raw_dir, motif)) + glob.glob(os.path.join(raw_dir, "*", motif))
+    )
     if not correspondances:
         raise FileNotFoundError(f"Aucun fichier correspondant à {motif!r} dans {raw_dir} (ni ses sous-répertoires)")
     return correspondances
 
 
 def main(raw_dir: str, output_dir: str, date_reference: date | None = None) -> None:
-    """Point d'entrée batch : lit les 3 fichiers DIS de `raw_dir` (année la
-    plus récente uniquement — l'agrégation multi-années glissantes est un
-    raffinement futur), écrit une fiche JSON par commune sous
-    `output_dir/communes/{code_insee}.json` + un `index.json` global."""
+    """Point d'entrée batch : fusionne les fichiers DIS_PLV/DIS_RESULT de
+    toutes les années trouvées sous `raw_dir` (à plat ou dans des
+    sous-répertoires annuels, §2.1), utilise le référentiel DIS_COM_UDI le
+    plus récent uniquement (snapshot, pas une série temporelle), et écrit
+    une fiche JSON par commune sous `output_dir/communes/{code_insee}.json`
+    + un `index.json` global."""
     date_reference = date_reference or datetime.now(timezone.utc).date()
     plv_paths = _trouver_fichiers(raw_dir, "DIS_PLV*.txt")
     result_paths = _trouver_fichiers(raw_dir, "DIS_RESULT*.txt")

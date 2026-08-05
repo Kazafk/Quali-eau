@@ -232,6 +232,49 @@ def test_construire_fiches_commune_sans_mesure_recoit_fiche_indisponible():
     assert fiches["99999"]["scores"] is None
 
 
+def test_construire_fiches_commune_avec_mesures_trop_anciennes_est_indisponible(tmp_path):
+    # BUG CRITIQUE (revue finale, Finding C1) : avant le correctif, une
+    # commune dont TOUTES les mesures sont hors fenêtre (>730 jours) recevait
+    # statut_donnees="complet" avec des sous-scores None — la fusion
+    # multi-années de ce plan rend ce cas atteignable (~2023-2024 sont hors
+    # fenêtre par rapport à une date_reference de 2026), en violation de
+    # §2.5.6 (une commune sans mesure exploitable doit être "indisponible").
+    date_ref = date(2026, 8, 5)
+    plv_contenu = (
+        "cddept,cdreseau,inseecommuneprinc,nomcommuneprinc,cdreseauamont,nomreseauamont,"
+        "pourcentdebit,referenceprel,dateprel,heureprel,conclusionprel,ugelib,distrlib,"
+        "moalib,plvconformitebacterio,plvconformitechimique,plvconformitereferencebact,"
+        "plvconformitereferencechim\n"
+        '"012","012000009","54321","VIEILLEVILLE","","","","REF-OLD","2023-01-01","09h00",'
+        '"x","","","","C","C","C","C"\n'
+    )
+    result_contenu = (
+        "cddept,referenceprel,cdparametresiseeaux,cdparametre,libmajparametre,libminparametre,"
+        "libwebparametre,qualitparam,insituana,rqana,cdunitereferencesiseeaux,cdunitereference,"
+        "limitequal,refqual,valtraduite,casparam,referenceanl\n"
+        '"012","REF-OLD","NO3","1340","NITRATES (EN NO3)","Nitrates (en NO3)",,"N","L","15",'
+        '"mg/L","162","<=50 mg/L","","15.000000","14797-55-8","ANL-OLD"\n'
+    )
+    udi_contenu = (
+        "inseecommune,nomcommune,quartier,cdreseau,nomreseau,debutalim\n"
+        '"54321","VIEILLEVILLE","-","012000009","RESEAU VIEILLEVILLE","2010-01-01"\n'
+    )
+    plv_path = tmp_path / "DIS_PLV_old.txt"
+    result_path = tmp_path / "DIS_RESULT_old.txt"
+    udi_path = tmp_path / "DIS_COM_UDI_old.txt"
+    plv_path.write_text(plv_contenu, encoding="utf-8")
+    result_path.write_text(result_contenu, encoding="utf-8")
+    udi_path.write_text(udi_contenu, encoding="utf-8")
+
+    fiches = construire_fiches(
+        plv_paths=[str(plv_path)], result_paths=[str(result_path)], udi_path=str(udi_path),
+        date_reference=date_ref,
+    )
+    assert "54321" in fiches
+    assert fiches["54321"]["statut_donnees"] == "indisponible"
+    assert fiches["54321"]["scores"] is None
+
+
 def test_trouver_fichiers_recherche_sous_repertoires_annuels(tmp_path):
     (tmp_path / "2025").mkdir()
     (tmp_path / "2026").mkdir()
