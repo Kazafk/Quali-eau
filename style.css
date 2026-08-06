@@ -15,7 +15,8 @@ html, body { margin: 0; padding: 0; height: 100%; font-family: system-ui, -apple
 }
 .toggle-btn.active { background: #fff; color: #0b3d5c; font-weight: 600; }
 
-main { position: relative; flex: 1; }
+main { position: relative; flex: 1; display: flex; }
+#map-container { position: relative; flex: 1; min-width: 0; }
 #map { position: absolute; inset: 0; background: #e8eef2; }
 
 #map-error {
@@ -35,10 +36,40 @@ main { position: relative; flex: 1; }
 .legend-row { display: flex; align-items: center; gap: 6px; margin: 2px 0; }
 .legend-swatch { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
 
-#panel { display: none; }
+#panel {
+  position: relative; width: 380px; flex-shrink: 0; background: #fff; overflow-y: auto;
+  border-left: 1px solid #ddd; padding: 16px 16px 32px;
+}
+/* Même piège de spécificité que #map-error (sous-projet 1, commit 825af745) :
+   ne jamais mettre display:block/flex sans le conditionner à :not([hidden]),
+   sous peine de rendre l'attribut hidden inopérant. */
+#panel:not([hidden]) { display: block; }
+
+#panel-close {
+  position: absolute; top: 8px; right: 8px; border: none; background: transparent;
+  font-size: 1.1rem; cursor: pointer; line-height: 1;
+}
+
+.jauge { margin-bottom: 16px; }
+.jauge h3 { margin: 0 0 4px; font-size: 0.95rem; }
+.jauge-score { font-size: 1.3rem; font-weight: 700; }
+.jauge-veto { color: #c0392b; font-weight: 600; margin: 4px 0; }
+.jauge-indispo { color: #777; font-style: italic; }
+.sous-score-row { display: flex; justify-content: space-between; font-size: 0.85rem; padding: 2px 0; }
+.reco { margin-bottom: 10px; font-size: 0.85rem; }
+.reco-cout { color: #555; font-size: 0.8rem; margin: 2px 0 0; }
+.panel-code { color: #777; font-size: 0.8rem; margin: -8px 0 12px; }
+.panel-indispo, .panel-erreur, .panel-chargement { color: #555; }
 
 @media (max-width: 600px) {
   #app-header { padding: 8px 12px; }
   #app-header h1 { font-size: 1rem; width: 100%; }
   #legend { left: 8px; bottom: 8px; font-size: 0.72rem; padding: 8px 10px; }
+
+  main { flex-direction: column; }
+  #panel {
+    position: fixed; left: 0; right: 0; bottom: 0; width: auto;
+    max-height: 70vh; max-height: 70dvh; border-left: none; border-top: 1px solid #ddd;
+    border-radius: 12px 12px 0 0; box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.15); z-index: 6;
+  }
 }
