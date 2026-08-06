@@ -2,13 +2,17 @@ import { NO_DATA, SCORE_THRESHOLDS } from './scoring.js';
 import { joindreScoresSurGeojson } from './geo_join.js';
 
 const CARTE_SCORES_URL = './data/carte_scores.json';
-const GEOJSON_URL = 'https://raw.githubusercontent.com/gregoiredavid/france-geojson/master/communes-version-simplifiee.geojson';
+// Épinglé au dernier commit ayant touché ce fichier (vérifié via l'API GitHub) plutôt
+// que la branche master mutable — évite qu'un changement amont (format, suppression)
+// casse silencieusement la carte en production.
+const GEOJSON_URL = 'https://raw.githubusercontent.com/gregoiredavid/france-geojson/45daa2d069a8da3ec4efb6672388fc3dc02e36e2/communes-version-simplifiee.geojson';
 const MAP_STYLE = 'https://tiles.openfreemap.org/styles/positron';
 
 let carteScores = null;
 let geojson = null;
 let map = null;
 let indicateurActif = 'score_boisson';
+let chargementReussi = false;
 
 async function chargerDonnees() {
   const [reponseScores, reponseGeojson] = await Promise.all([
@@ -45,6 +49,9 @@ function renderLegend() {
 }
 
 function activerIndicateur(indicateur) {
+  if (!map || !map.getSource('communes')) {
+    return;
+  }
   indicateurActif = indicateur;
   document.getElementById('btn-boisson').classList.toggle('active', indicateur === 'score_boisson');
   document.getElementById('btn-cosmetique').classList.toggle('active', indicateur === 'score_cosmetique');
@@ -90,11 +97,14 @@ function initCarte() {
     map.on('click', 'communes-fill', onClicCommune);
     map.on('mouseenter', 'communes-fill', () => { map.getCanvas().style.cursor = 'pointer'; });
     map.on('mouseleave', 'communes-fill', () => { map.getCanvas().style.cursor = ''; });
+    chargementReussi = true;
   });
 
   map.on('error', (e) => {
     console.error('Erreur MapLibre :', e.error);
-    afficherErreur();
+    if (!chargementReussi) {
+      afficherErreur();
+    }
   });
 }
 
