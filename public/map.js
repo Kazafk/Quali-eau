@@ -1,6 +1,6 @@
 import { NO_DATA, SCORE_THRESHOLDS } from './scoring.js';
 import { joindreScoresSurGeojson, resolveCodeInsee } from './geo_join.js';
-import { afficherCommune, initPanel } from './panel.js';
+import { afficherCommune, afficherCommuneSansDonnees, initPanel } from './panel.js';
 
 const CARTE_SCORES_URL = './data/carte_scores.json';
 // Épinglé au dernier commit ayant touché ce fichier (vérifié via l'API GitHub) plutôt
@@ -35,6 +35,10 @@ function afficherErreur() {
 function onClicCommune(event) {
   const feature = event.features[0];
   const code = resolveCodeInsee(feature.properties.code);
+  if (!carteScores[code]) {
+    afficherCommuneSansDonnees(feature.properties.nom);
+    return;
+  }
   afficherCommune(code, feature.properties.nom);
 }
 
