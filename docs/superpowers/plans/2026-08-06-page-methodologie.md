@@ -38,7 +38,7 @@
 - Consumes: nothing new.
 - Produces: a reachable link to `methodologie.html` from the main site's header. `public/methodologie.html` (Task 2) must exist at that exact relative path for this link to resolve — Task 3 verifies the full round trip.
 
-- [ ] **Step 1: Add the link to `public/index.html`**
+- [x] **Step 1: Add the link to `public/index.html`**
 
 Replace:
 ```html
@@ -54,7 +54,7 @@ with:
       <div id="recherche">
 ```
 
-- [ ] **Step 2: Style the link in `public/style.css`**
+- [x] **Step 2: Style the link in `public/style.css`**
 
 Replace:
 ```css
@@ -71,7 +71,7 @@ with:
 #toggle-indicateur { display: flex; gap: 4px; flex-wrap: wrap; }
 ```
 
-- [ ] **Step 3: Structural verification**
+- [x] **Step 3: Structural verification**
 
 ```bash
 cd "C:/Repos/Quali'eau/.claude/worktrees/phase2-carte-nationale/public"
@@ -79,7 +79,7 @@ python -m http.server 8000
 ```
 In another terminal: `curl -s http://localhost:8000/ | grep 'lien-methodologie'` — expect the `<a id="lien-methodologie" href="methodologie.html">` line to appear. Stop the server when done. (The link will 404 until Task 2 creates the target page — that's expected at this point in the plan.)
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 cd "C:/Repos/Quali'eau/.claude/worktrees/phase2-carte-nationale"
@@ -99,7 +99,7 @@ git commit -m "feat: add header link to the methodology page"
 - Consumes: `public/style.css` (shared stylesheet, `#app`/`#app-header` shell already styled by Task 1 and earlier sub-projects).
 - Produces: the reachable target of Task 1's header link. Contains its own link back to `index.html`.
 
-- [ ] **Step 1: Write `public/methodologie.html`**
+- [x] **Step 1: Write `public/methodologie.html`**
 
 ```html
 <!DOCTYPE html>
@@ -217,7 +217,7 @@ git commit -m "feat: add header link to the methodology page"
 </html>
 ```
 
-- [ ] **Step 2: Add content styling to `public/style.css`**
+- [x] **Step 2: Add content styling to `public/style.css`**
 
 Append at the end of the file (after the existing `@media (max-width: 600px) { ... }` block):
 
@@ -240,7 +240,7 @@ Append at the end of the file (after the existing `@media (max-width: 600px) { .
 #lien-retour:hover { background: rgba(255, 255, 255, 0.15); }
 ```
 
-- [ ] **Step 3: Structural verification**
+- [x] **Step 3: Structural verification**
 
 ```bash
 cd "C:/Repos/Quali'eau/.claude/worktrees/phase2-carte-nationale/public"
@@ -248,7 +248,7 @@ python -m http.server 8000
 ```
 In another terminal: `curl -s -o /dev/null -w "%{http_code}\n" http://localhost:8000/methodologie.html` — expect `200`. `curl -s http://localhost:8000/methodologie.html | grep -c '<h2>'` — expect `4` (Vision, Système de scoring, Recommandations, Mentions légales). `curl -s http://localhost:8000/methodologie.html | grep 'lien-retour'` — expect the back-link to `index.html`. Stop the server when done. The controller performs the real visual verification after this task (Task 3).
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 cd "C:/Repos/Quali'eau/.claude/worktrees/phase2-carte-nationale"
@@ -262,7 +262,7 @@ git commit -m "feat: add the methodology page content"
 
 **This task is not a code task** — it walks through the full manual checklist from the design spec (`docs/superpowers/specs/2026-08-06-page-methodologie-design.md`) against the finished feature.
 
-- [ ] **Step 1: Full manual walkthrough**
+- [x] **Step 1: Full manual walkthrough**
 
 ```bash
 cd "C:/Repos/Quali'eau/.claude/worktrees/phase2-carte-nationale/public"
@@ -279,6 +279,6 @@ Open `http://localhost:8000` and confirm every item:
 
 Stop the server (Ctrl+C) when done. If any check fails, fix it as part of this task before proceeding.
 
-- [ ] **Step 2: Report**
+- [x] **Step 2: Report**
 
 Confirm to the user that the page méthodologie sub-project (Phase 2, 5/5, the last one) is complete and working end-to-end, with a summary of what was verified in Step 1. Phase 2 is now fully complete.

@@ -686,7 +686,9 @@ def estimate_cost(param_code: str, value: float) -> dict | None:
 - [x] Fiche communale au clic (panneau latéral desktop / tiroir bas mobile, doubles jauges, sous-scores, alerte veto sanitaire, recommandations) — **sans historique ni indicateurs bruts** (absents du schéma des fiches, décision produit actée au sous-projet 1). Détails : `docs/superpowers/specs/2026-08-06-fiche-communale-design.md`.
 - [x] Recherche + géolocalisation via geo.api.gouv.fr (client-side) — désambiguïsation par département sur homonymes, réutilise le chemin clic→fiche existant. Détails : `docs/superpowers/specs/2026-08-06-recherche-geolocalisation-design.md`.
 - [x] Workflow `update-data.yml` + premier déploiement GitHub Pages — mis en place directement par l'utilisateur (hors cycle spec/plan), déploiement confirmé réussi.
-- [ ] Page méthodologie.
+- [x] Page méthodologie (`public/methodologie.html`, lien depuis le header). Détails : `docs/superpowers/specs/2026-08-06-page-methodologie-design.md`.
+
+**Phase 2 terminée.** Dette technique actée (voir revue finale du sous-projet 5) : le rendu mobile (< 600px) de l'ensemble du site statique (5 sous-projets) n'a jamais été vérifié visuellement dans un vrai viewport étroit — limitation de l'outillage de redimensionnement de fenêtre disponible en session, pas un doute sur le CSS lui-même (tracé à la main, jugé correct). À vérifier manuellement sur un vrai appareil/émulateur avant une communication publique large, ou en ajoutant un test automatisé dédié (ex. Playwright, une seule assertion de largeur de viewport) si Phase 3 introduit un outillage de test.
 
 ### Phase 3 : Fonctionnalités Avancées
 - [ ] Module expert café / thé (profil SCA complet, onglet dédié).
