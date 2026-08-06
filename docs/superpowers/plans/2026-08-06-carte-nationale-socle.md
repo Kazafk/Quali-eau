@@ -50,7 +50,7 @@
 - Consumes: nothing new — operates on the `fiches: dict` shape already produced by `pipeline.compute_scores.construire_fiches` (each value has `statut_donnees: str` and either `scores: None` or `scores: {"boisson": {"score": int, ...}, "cosmetique": {"score": int, ...}, ...}`).
 - Produces: `pipeline.compute_scores.construire_carte_scores(fiches: dict) -> dict`, mapping `code_insee -> {"score_boisson": int | None, "score_cosmetique": int | None, "statut_donnees": str}`. Called by `main()`, which writes it to `{output_dir}/carte_scores.json`.
 
-- [ ] **Step 1: Write the failing unit tests**
+- [x] **Step 1: Write the failing unit tests**
 
 Append to `tests/test_compute_scores.py`:
 
@@ -87,12 +87,12 @@ def test_construire_carte_scores_commune_indisponible_a_scores_null():
     }
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `pytest tests/test_compute_scores.py -v -k construire_carte_scores`
 Expected: FAIL with `ImportError: cannot import name 'construire_carte_scores'`
 
-- [ ] **Step 3: Implement `construire_carte_scores`**
+- [x] **Step 3: Implement `construire_carte_scores`**
 
 In `pipeline/compute_scores.py`, add this function directly after `construire_fiches`:
 
@@ -114,12 +114,12 @@ def construire_carte_scores(fiches: dict) -> dict:
     return carte
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `pytest tests/test_compute_scores.py -v -k construire_carte_scores`
 Expected: PASS (2 tests)
 
-- [ ] **Step 5: Wire `construire_carte_scores` into `main()`**
+- [x] **Step 5: Wire `construire_carte_scores` into `main()`**
 
 In `pipeline/compute_scores.py`, in `main()`, replace:
 
@@ -149,7 +149,7 @@ with:
         json.dump(carte_scores, f, ensure_ascii=False, indent=2)
 ```
 
-- [ ] **Step 6: Write the failing integration test**
+- [x] **Step 6: Write the failing integration test**
 
 Append to `tests/test_pipeline_integration.py`:
 
@@ -175,17 +175,17 @@ def test_pipeline_ecrit_carte_scores_json(tmp_path):
     assert isinstance(carte["34116"]["score_cosmetique"], int)
 ```
 
-- [ ] **Step 7: Run test to verify it fails, then passes**
+- [x] **Step 7: Run test to verify it fails, then passes**
 
 Run: `pytest tests/test_pipeline_integration.py -v -k carte_scores`
 Expected: first FAIL (`carte_scores.json` doesn't exist — this only fails if Step 5 wasn't done; since it was, expect it to already PASS here) — run it and confirm PASS.
 
-- [ ] **Step 8: Run the entire test suite**
+- [x] **Step 8: Run the entire test suite**
 
 Run: `pytest tests/ -v`
 Expected: PASS (all tests, full project)
 
-- [ ] **Step 9: Regenerate real `carte_scores.json` from the already-computed fiches**
+- [x] **Step 9: Regenerate real `carte_scores.json` from the already-computed fiches**
 
 `public/data/communes/*.json` (34 845 files) were already generated and committed against real DIS 2023-2026 data in a previous plan. Re-running the full pipeline would require re-downloading ~900 Mo. Instead, derive `carte_scores.json` directly from the fiches already on disk:
 
@@ -210,7 +210,7 @@ print(f'{len(carte_scores)} communes ecrites dans carte_scores.json')
 ```
 Expected: prints a count close to 34 845 (matches the number of files in `public/data/communes/`). This file is needed as real test data by Task 5 onward.
 
-- [ ] **Step 10: Commit**
+- [x] **Step 10: Commit**
 
 ```bash
 cd "C:/Repos/Quali'eau/.claude/worktrees/phase2-carte-nationale"
@@ -229,7 +229,7 @@ git commit -m "feat: add carte_scores.json output for client-side map coloring"
 - Consumes: nothing.
 - Produces: `SCORE_THRESHOLDS` (array of `{seuil: number, classe: 'A'|'B'|'C'|'D'|'E', couleur: string, libelle: string}`, ordered highest-to-lowest `seuil`), `NO_DATA` (`{classe: null, couleur: string, libelle: string}`), `classeFromScore(score: number | null) -> {classe, couleur, libelle}`. Used by `public/geo_join.js` (Task 3) and `public/map.js` (Tasks 5-6).
 
-- [ ] **Step 1: Write `public/scoring.js`**
+- [x] **Step 1: Write `public/scoring.js`**
 
 ```js
 // Seuils Nutri-Score A-E (README, "Système de Scoring Dual") — source unique
@@ -254,7 +254,7 @@ export function classeFromScore(score) {
 }
 ```
 
-- [ ] **Step 2: Sanity-check with `node`**
+- [x] **Step 2: Sanity-check with `node`**
 
 Run (from the repo root):
 ```bash
@@ -267,7 +267,7 @@ console.log(JSON.stringify(resultats));
 ```
 Expected: `["A","B","C","D","E",null]`
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 cd "C:/Repos/Quali'eau/.claude/worktrees/phase2-carte-nationale"
@@ -286,7 +286,7 @@ git commit -m "feat: add scoring.js with A-E thresholds and classeFromScore"
 - Consumes: `classeFromScore` from `public/scoring.js` (Task 2).
 - Produces: `ARR_PARENT` (object, arrondissement code → parent commune code), `resolveCodeInsee(codeInsee: string) -> string`, `joindreScoresSurGeojson(geojson: {features: Array<{properties: {code: string}}>}, carteScores: dict, indicateur: 'score_boisson' | 'score_cosmetique') -> geojson` (mutates `feature.properties.color` in place on every feature, returns the same object). Used by `public/map.js` (Tasks 5-6).
 
-- [ ] **Step 1: Write `public/geo_join.js`**
+- [x] **Step 1: Write `public/geo_join.js`**
 
 ```js
 import { classeFromScore } from './scoring.js';
@@ -321,7 +321,7 @@ export function joindreScoresSurGeojson(geojson, carteScores, indicateur) {
 }
 ```
 
-- [ ] **Step 2: Sanity-check with `node`**
+- [x] **Step 2: Sanity-check with `node`**
 
 Run (from the repo root):
 ```bash
@@ -357,7 +357,7 @@ Expected:
 ```
 (75108 resolves to Paris, score 90 → classe A → `#1e8f4e`; 34116 score 45 → classe C → `#f4c430`; 99999 has no entry and isn't an arrondissement → no-data grey `#b0b0b0`.)
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 cd "C:/Repos/Quali'eau/.claude/worktrees/phase2-carte-nationale"
@@ -378,7 +378,7 @@ git commit -m "feat: add geo_join.js with arrondissement mapping and client-side
 - Consumes: nothing (static shell only).
 - Produces: DOM element ids consumed by Tasks 5-6: `map` (map container), `map-error` (hidden error banner), `legend` (legend container), `btn-boisson` / `btn-cosmetique` (toggle buttons, `btn-boisson` starts with class `active`), `panel` (empty placeholder for a future sub-project).
 
-- [ ] **Step 1: Write `public/index.html`**
+- [x] **Step 1: Write `public/index.html`**
 
 ```html
 <!DOCTYPE html>
@@ -412,7 +412,7 @@ git commit -m "feat: add geo_join.js with arrondissement mapping and client-side
 </html>
 ```
 
-- [ ] **Step 2: Write `public/style.css`**
+- [x] **Step 2: Write `public/style.css`**
 
 ```css
 * { box-sizing: border-box; }
@@ -457,13 +457,13 @@ main { position: relative; flex: 1; }
 }
 ```
 
-- [ ] **Step 3: Write a minimal `public/map.js` (replaced in Task 5)**
+- [x] **Step 3: Write a minimal `public/map.js` (replaced in Task 5)**
 
 ```js
 console.log("Quali'eau — carte nationale : chargement de la page");
 ```
 
-- [ ] **Step 4: Manual verification**
+- [x] **Step 4: Manual verification**
 
 ```bash
 cd "C:/Repos/Quali'eau/.claude/worktrees/phase2-carte-nationale/public"
@@ -471,7 +471,7 @@ python -m http.server 8000
 ```
 Open `http://localhost:8000` in a browser. Expected: dark blue header with "💧 Quali'eau" title and two toggle buttons (Boisson highlighted white/active), a light gray-blue rectangle filling the rest of the viewport (the future map area), no visible legend box content yet (empty `#legend` div), browser console shows exactly `Quali'eau — carte nationale : chargement de la page` with no errors. Resize the window to a narrow (mobile) width and confirm the header wraps without overlapping. Stop the server (Ctrl+C) when done.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd "C:/Repos/Quali'eau/.claude/worktrees/phase2-carte-nationale"
@@ -490,7 +490,7 @@ git commit -m "feat: add static page shell for the national map"
 - Consumes: `NO_DATA` from `public/scoring.js` (Task 2); `joindreScoresSurGeojson` from `public/geo_join.js` (Task 3); DOM ids `map`, `map-error` from `public/index.html` (Task 4); global `maplibregl` (loaded via the CDN `<script>` tag in `index.html`).
 - Produces: module-level state (`carteScores`, `geojson`, `map`, `indicateurActif`) and functions `chargerDonnees()`, `afficherErreur()`, `onClicCommune(event)`, `initCarte()`, `demarrer()` — `initCarte` and `indicateurActif` are extended by Task 6 (legend + toggle); `onClicCommune` is a stub for a future sub-project (fiche communale).
 
-- [ ] **Step 1: Replace `public/map.js` with the full implementation**
+- [x] **Step 1: Replace `public/map.js` with the full implementation**
 
 ```js
 import { NO_DATA } from './scoring.js';
@@ -581,7 +581,7 @@ async function demarrer() {
 demarrer();
 ```
 
-- [ ] **Step 2: Manual verification — happy path**
+- [x] **Step 2: Manual verification — happy path**
 
 ```bash
 cd "C:/Repos/Quali'eau/.claude/worktrees/phase2-carte-nationale/public"
@@ -589,11 +589,11 @@ python -m http.server 8000
 ```
 Open `http://localhost:8000`. Expected: a map of metropolitan France appears within a few seconds, communes filled with colors from the A-E palette defined in `scoring.js` (greens/yellow/orange/red), Paris/Lyon/Marseille render as single-colored blobs (not a patchwork of 45+ grey slivers — confirms the arrondissement mapping works against the real geometry file), zoom/pan works via the top-right navigation control, no uncaught errors in the browser console. Zoom into Paris specifically and confirm all 20 arrondissements share the exact same fill color.
 
-- [ ] **Step 3: Manual verification — error path**
+- [x] **Step 3: Manual verification — error path**
 
 With the local server still running, open the browser DevTools Network tab, set throttling to "Offline" (or block the request to `communes-version-simplifiee.geojson` via a request-blocking rule), then reload the page. Expected: the map area is replaced by the visible text "Impossible de charger la carte. Réessayez plus tard.", the `#map` div is hidden, the console shows the logged error, no infinite spinner or blank white screen. Restore normal network conditions afterward.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 cd "C:/Repos/Quali'eau/.claude/worktrees/phase2-carte-nationale"
@@ -612,7 +612,7 @@ git commit -m "feat: render national map with client-side geometry/score join"
 - Consumes: `SCORE_THRESHOLDS`, `NO_DATA` from `public/scoring.js` (Task 2, `NO_DATA` already imported by Task 5 — add `SCORE_THRESHOLDS` to that import); `joindreScoresSurGeojson` (already imported by Task 5); DOM ids `legend`, `btn-boisson`, `btn-cosmetique` from `public/index.html` (Task 4).
 - Produces: `renderLegend()`, `activerIndicateur(indicateur)`, `initBascule()` — called once from `initCarte()`.
 
-- [ ] **Step 1: Update the `scoring.js` import and add the new functions**
+- [x] **Step 1: Update the `scoring.js` import and add the new functions**
 
 In `public/map.js`, change:
 ```js
@@ -650,7 +650,7 @@ function initBascule() {
 }
 ```
 
-- [ ] **Step 2: Call the new functions from `initCarte()`**
+- [x] **Step 2: Call the new functions from `initCarte()`**
 
 In `public/map.js`, at the very start of `initCarte()`, change:
 ```js
@@ -665,7 +665,7 @@ function initCarte() {
   joindreScoresSurGeojson(geojson, carteScores, indicateurActif);
 ```
 
-- [ ] **Step 3: Manual verification**
+- [x] **Step 3: Manual verification**
 
 ```bash
 cd "C:/Repos/Quali'eau/.claude/worktrees/phase2-carte-nationale/public"
@@ -673,7 +673,7 @@ python -m http.server 8000
 ```
 Open `http://localhost:8000`. Expected: the bottom-left legend box now shows 6 rows (A "Parfait" through E "Critique", plus "Données indisponibles"), each with a color swatch matching the map's palette. Click "🧴 Cosmétique & Lavage" — expected: that button becomes highlighted/active, "🥤 Boisson & Santé" loses its active style, and the map recolors (e.g., Paris — which scores low on `score_boisson` due to its sanitary veto but reasonably on `score_cosmetique` — visibly changes color). Click back to "🥤 Boisson & Santé" and confirm it reverts. No console errors during either toggle.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 cd "C:/Repos/Quali'eau/.claude/worktrees/phase2-carte-nationale"
@@ -687,7 +687,7 @@ git commit -m "feat: add score legend and Boisson/Cosmétique toggle to the map"
 
 **This task is not a code task** — it re-runs the automated suite and walks through the full manual checklist from the design spec (`docs/superpowers/specs/2026-08-06-carte-nationale-design.md`) against the finished feature, across all previous tasks together.
 
-- [ ] **Step 1: Run the full pytest suite**
+- [x] **Step 1: Run the full pytest suite**
 
 ```bash
 cd "C:/Repos/Quali'eau/.claude/worktrees/phase2-carte-nationale"
@@ -695,7 +695,7 @@ pytest tests/ -v
 ```
 Expected: PASS (all tests, full project — pre-existing tests plus this plan's additions).
 
-- [ ] **Step 2: Full manual walkthrough**
+- [x] **Step 2: Full manual walkthrough**
 
 ```bash
 cd "C:/Repos/Quali'eau/.claude/worktrees/phase2-carte-nationale/public"
@@ -713,6 +713,6 @@ Open `http://localhost:8000` and confirm every item:
 
 Stop the server (Ctrl+C) when done. If any check fails, fix it as part of this task before proceeding (do not silently accept a broken behavior as "good enough").
 
-- [ ] **Step 3: Report**
+- [x] **Step 3: Report**
 
 Confirm to the user that the socle carte nationale sub-project (Phase 2, 1/5) is complete and working end-to-end, with a summary of what was verified in Step 2, before moving on to the next sub-project (fiche communale au clic).
