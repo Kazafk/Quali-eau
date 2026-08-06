@@ -8,6 +8,27 @@ html, body { margin: 0; padding: 0; height: 100%; font-family: system-ui, -apple
 }
 #app-header h1 { font-size: 1.1rem; margin: 0; }
 
+#recherche { position: relative; display: flex; gap: 4px; align-items: center; flex: 1 1 200px; max-width: 280px; }
+#recherche-input {
+  flex: 1; min-width: 0; padding: 6px 10px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.15); color: #fff; font-size: 0.85rem;
+}
+#recherche-input::placeholder { color: rgba(255, 255, 255, 0.7); }
+#btn-geoloc {
+  border: 1px solid rgba(255, 255, 255, 0.4); background: transparent; color: #fff;
+  padding: 6px 8px; border-radius: 6px; cursor: pointer; font-size: 0.9rem;
+}
+#recherche-suggestions {
+  position: absolute; top: 100%; left: 0; right: 0; margin: 4px 0 0; padding: 0; list-style: none;
+  background: #fff; border-radius: 6px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25); z-index: 10; overflow: hidden;
+}
+#recherche-suggestions li { padding: 8px 10px; font-size: 0.85rem; color: #222; cursor: pointer; }
+#recherche-suggestions li:hover { background: #f0f0f0; }
+#recherche-erreur {
+  position: absolute; top: 100%; left: 0; margin: 4px 0 0; font-size: 0.75rem; color: #fff;
+  background: #c0392b; padding: 4px 8px; border-radius: 6px; z-index: 10;
+}
+
 #toggle-indicateur { display: flex; gap: 4px; flex-wrap: wrap; }
 .toggle-btn {
   border: 1px solid rgba(255, 255, 255, 0.4); background: transparent; color: #fff;
@@ -65,6 +86,8 @@ main { position: relative; flex: 1; display: flex; }
   #app-header { padding: 8px 12px; }
   #app-header h1 { font-size: 1rem; width: 100%; }
   #legend { left: 8px; bottom: 8px; font-size: 0.72rem; padding: 8px 10px; }
+
+  #recherche { flex: 1 1 100%; max-width: none; order: 3; }
 
   main { flex-direction: column; }
   #panel {

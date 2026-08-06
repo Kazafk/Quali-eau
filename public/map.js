@@ -1,6 +1,7 @@
 import { NO_DATA, SCORE_THRESHOLDS } from './scoring.js';
 import { joindreScoresSurGeojson, resolveCodeInsee } from './geo_join.js';
 import { afficherCommune, afficherCommuneSansDonnees, initPanel } from './panel.js';
+import { initRecherche } from './search.js';
 
 const CARTE_SCORES_URL = './data/carte_scores.json';
 // Épinglé au dernier commit ayant touché ce fichier (vérifié via l'API GitHub) plutôt
@@ -30,16 +31,27 @@ async function chargerDonnees() {
 function afficherErreur() {
   document.getElementById('map-error').hidden = false;
   document.getElementById('map').hidden = true;
+  document.getElementById('recherche-input').disabled = true;
+  document.getElementById('btn-geoloc').disabled = true;
+}
+
+export function selectionnerCommune(code, nom) {
+  if (!carteScores[code]) {
+    afficherCommuneSansDonnees(code, nom);
+    return;
+  }
+  afficherCommune(code, nom);
 }
 
 function onClicCommune(event) {
   const feature = event.features[0];
   const code = resolveCodeInsee(feature.properties.code);
-  if (!carteScores[code]) {
-    afficherCommuneSansDonnees(code, feature.properties.nom);
-    return;
-  }
-  afficherCommune(code, feature.properties.nom);
+  selectionnerCommune(code, feature.properties.nom);
+}
+
+export function centrerEtSelectionner(code, nom, lon, lat) {
+  map.flyTo({ center: [lon, lat], zoom: 11 });
+  selectionnerCommune(code, nom);
 }
 
 function renderLegend() {
@@ -72,6 +84,7 @@ function initCarte() {
   renderLegend();
   initBascule();
   initPanel();
+  initRecherche(centrerEtSelectionner);
   joindreScoresSurGeojson(geojson, carteScores, indicateurActif);
 
   map = new maplibregl.Map({

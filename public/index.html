@@ -11,6 +11,12 @@
   <div id="app">
     <header id="app-header">
       <h1>💧 Quali'eau</h1>
+      <div id="recherche">
+        <input id="recherche-input" type="text" placeholder="Rechercher une commune…" autocomplete="off">
+        <button id="btn-geoloc" type="button" aria-label="Me géolocaliser">📍</button>
+        <ul id="recherche-suggestions" hidden></ul>
+        <p id="recherche-erreur" hidden></p>
+      </div>
       <div id="toggle-indicateur">
         <button id="btn-boisson" class="toggle-btn active" type="button">🥤 Boisson &amp; Santé</button>
         <button id="btn-cosmetique" class="toggle-btn" type="button">🧴 Cosmétique &amp; Lavage</button>
