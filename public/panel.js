@@ -46,3 +46,65 @@ export function recommandationsHtml(recommandations) {
   }
   return `<h3>Recommandations</h3>${sectionRecommandations('🥤 Boisson & Santé', parUsage.boisson)}${sectionRecommandations('🧴 Cosmétique & Lavage', parUsage.cosmetique)}`;
 }
+
+const cacheFiches = new Map();
+let requeteActuelle = 0;
+
+function fermerPanneau() {
+  document.getElementById('panel').hidden = true;
+}
+
+function ouvrirPanneau() {
+  document.getElementById('panel').hidden = false;
+}
+
+function rendreFiche(nom, codeInsee, fiche) {
+  const contenu = document.getElementById('panel-content');
+  if (fiche.statut_donnees === 'indisponible') {
+    contenu.innerHTML = `<h2>${echapperHtml(nom)}</h2><p class="panel-code">${codeInsee}</p><p class="panel-indispo">Aucune donnée disponible pour cette commune.</p>`;
+    return;
+  }
+  contenu.innerHTML = `
+    <h2>${echapperHtml(nom)}</h2>
+    <p class="panel-code">${codeInsee}</p>
+    ${jaugeHtml('🥤 Boisson & Santé', fiche.scores.boisson.score, fiche.scores.boisson.sous_scores, fiche.scores.boisson.veto_sanitaire)}
+    ${jaugeHtml('🧴 Cosmétique & Lavage', fiche.scores.cosmetique.score, fiche.scores.cosmetique.sous_scores, false)}
+    ${recommandationsHtml(fiche.recommandations)}
+  `;
+}
+
+function afficherErreurPanneau(nom) {
+  document.getElementById('panel-content').innerHTML =
+    `<h2>${echapperHtml(nom)}</h2><p class="panel-erreur">Impossible de charger les données de cette commune. Réessayez plus tard.</p>`;
+}
+
+export async function afficherCommune(codeInsee, nom) {
+  ouvrirPanneau();
+  requeteActuelle += 1;
+  const monNumero = requeteActuelle;
+  document.getElementById('panel-content').innerHTML = `<h2>${echapperHtml(nom)}</h2><p class="panel-chargement">Chargement…</p>`;
+
+  if (cacheFiches.has(codeInsee)) {
+    rendreFiche(nom, codeInsee, cacheFiches.get(codeInsee));
+    return;
+  }
+
+  try {
+    const reponse = await fetch(`./data/communes/${codeInsee}.json`);
+    if (!reponse.ok) {
+      throw new Error(`HTTP ${reponse.status}`);
+    }
+    const fiche = await reponse.json();
+    if (monNumero !== requeteActuelle) return;
+    cacheFiches.set(codeInsee, fiche);
+    rendreFiche(nom, codeInsee, fiche);
+  } catch (erreur) {
+    if (monNumero !== requeteActuelle) return;
+    console.error(erreur);
+    afficherErreurPanneau(nom);
+  }
+}
+
+export function initPanel() {
+  document.getElementById('panel-close').addEventListener('click', fermerPanneau);
+}
