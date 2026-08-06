@@ -1,4 +1,4 @@
-import { NO_DATA } from './scoring.js';
+import { NO_DATA, SCORE_THRESHOLDS } from './scoring.js';
 import { joindreScoresSurGeojson } from './geo_join.js';
 
 const CARTE_SCORES_URL = './data/carte_scores.json';
@@ -34,7 +34,32 @@ function onClicCommune(event) {
   console.log('Commune cliquée (fiche à venir) :', feature.properties.code);
 }
 
+function renderLegend() {
+  const lignes = SCORE_THRESHOLDS.map(
+    (p) => `<div class="legend-row"><span class="legend-swatch" style="background:${p.couleur}"></span>${p.classe} — ${p.libelle}</div>`
+  );
+  lignes.push(
+    `<div class="legend-row"><span class="legend-swatch" style="background:${NO_DATA.couleur}"></span>${NO_DATA.libelle}</div>`
+  );
+  document.getElementById('legend').innerHTML = lignes.join('');
+}
+
+function activerIndicateur(indicateur) {
+  indicateurActif = indicateur;
+  document.getElementById('btn-boisson').classList.toggle('active', indicateur === 'score_boisson');
+  document.getElementById('btn-cosmetique').classList.toggle('active', indicateur === 'score_cosmetique');
+  joindreScoresSurGeojson(geojson, carteScores, indicateurActif);
+  map.getSource('communes').setData(geojson);
+}
+
+function initBascule() {
+  document.getElementById('btn-boisson').addEventListener('click', () => activerIndicateur('score_boisson'));
+  document.getElementById('btn-cosmetique').addEventListener('click', () => activerIndicateur('score_cosmetique'));
+}
+
 function initCarte() {
+  renderLegend();
+  initBascule();
   joindreScoresSurGeojson(geojson, carteScores, indicateurActif);
 
   map = new maplibregl.Map({
