@@ -681,9 +681,9 @@ def estimate_cost(param_code: str, value: float) -> dict | None:
 - [ ] Tests unitaires sur 50 communes représentatives (eaux douces, dures, agricoles, urbaines, multi-UDI, PLM, cas < LQ, vetos sanitaires — incl. cas nitrates > 50 mg/L isolé).
 
 ### Phase 2 : Site Statique
-- [ ] `public/` : index.html, map.js (MapLibre), style.css — **fait** ; `panel.js` (fiche communale) — sous-projet 2, pas encore fait.
+- [x] `public/` : index.html, map.js (MapLibre), style.css, panel.js — vanilla JS, mobile-first.
 - [x] Carte nationale, bascule d'indicateurs Boisson/Cosmétique — **fait, mais par une architecture différente de celle décrite ci-dessus** : pas de `national.geojson` fusionné côté pipeline ; jointure géométrie (tierce, `france-geojson`) + scores (`public/data/carte_scores.json`, nouveau fichier léger) effectuée côté client. Détails et justification : `docs/superpowers/specs/2026-08-06-carte-nationale-design.md`. §5.1/§5.3 ci-dessus restent à corriger dans une future revue de cette spec pour refléter ce choix.
-- [ ] Fiche communale (lazy-loading, doubles jauges, historique, recommandations).
+- [x] Fiche communale au clic (panneau latéral desktop / tiroir bas mobile, doubles jauges, sous-scores, alerte veto sanitaire, recommandations) — **sans historique ni indicateurs bruts** (absents du schéma des fiches, décision produit actée au sous-projet 1). Détails : `docs/superpowers/specs/2026-08-06-fiche-communale-design.md`.
 - [ ] Recherche + géolocalisation via geo.api.gouv.fr (client-side).
 - [ ] Workflow `update-data.yml` + premier déploiement GitHub Pages.
 - [ ] Page méthodologie.

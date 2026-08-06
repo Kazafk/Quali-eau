@@ -41,7 +41,7 @@
 - Consumes: `classeFromScore` from `public/scoring.js` (`{classe, couleur, libelle}` for a score, or `NO_DATA`-shaped object for `null`).
 - Produces: `echapperHtml(texte: string) -> string`, `jaugeHtml(titre: string, score: number | null, sousScores: object, vetoSanitaire: boolean) -> string`, `recommandationsHtml(recommandations: Array<{usage, type, titre, description, estimation_cout?}>) -> string`. Used internally by Task 2's DOM layer in this same file — not exported beyond this module, but written first and tested standalone since they touch no `document` API.
 
-- [ ] **Step 1: Write `public/panel.js` with the three pure functions**
+- [x] **Step 1: Write `public/panel.js` with the three pure functions**
 
 ```js
 import { classeFromScore } from './scoring.js';
@@ -94,7 +94,7 @@ export function recommandationsHtml(recommandations) {
 }
 ```
 
-- [ ] **Step 2: Sanity-check with `node`**
+- [x] **Step 2: Sanity-check with `node`**
 
 Run (from the repo root):
 ```bash
@@ -121,7 +121,7 @@ true
 ```
 (the last line is an empty string — `recommandationsHtml([])` returns `''`)
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 cd "C:/Repos/Quali'eau/.claude/worktrees/phase2-carte-nationale"
@@ -140,7 +140,7 @@ git commit -m "feat: add pure HTML-rendering functions for the commune panel"
 - Consumes: `jaugeHtml`, `recommandationsHtml`, `echapperHtml` (Task 1, same file); DOM ids `panel`, `panel-content`, `panel-close` (Task 3, not yet created at this point in the plan — this task's manual verification therefore requires Task 3's HTML to exist; see note in Step 4).
 - Produces: `afficherCommune(codeInsee: string, nom: string) -> Promise<void>`, `initPanel() -> void`. Used by `public/map.js` (Task 4).
 
-- [ ] **Step 1: Append the DOM/fetch layer to `public/panel.js`**
+- [x] **Step 1: Append the DOM/fetch layer to `public/panel.js`**
 
 ```js
 const cacheFiches = new Map();
@@ -206,7 +206,7 @@ export function initPanel() {
 }
 ```
 
-- [ ] **Step 2: Syntax-check with `node`**
+- [x] **Step 2: Syntax-check with `node`**
 
 ```bash
 cd "C:/Repos/Quali'eau/.claude/worktrees/phase2-carte-nationale"
@@ -215,7 +215,7 @@ node --check /tmp/panel_no_imports.js
 ```
 Expected: no output (syntax OK). This only checks syntax — the DOM-touching functions cannot run under plain `node` (no `document` global) and are verified manually in Task 5, once Tasks 3-4 give them a real page to run on.
 
-- [ ] **Step 3: Find one real "indisponible" commune code for later manual testing**
+- [x] **Step 3: Find one real "indisponible" commune code for later manual testing**
 
 ```bash
 cd "C:/Repos/Quali'eau/.claude/worktrees/phase2-carte-nationale"
@@ -230,7 +230,7 @@ for nom in os.listdir('public/data/communes'):
 ```
 Expected: prints one 5-digit INSEE code. **Write this code down** — it is needed in Task 5's manual verification checklist (this plan cannot hardcode it since it depends on the current data snapshot).
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 cd "C:/Repos/Quali'eau/.claude/worktrees/phase2-carte-nationale"
@@ -252,7 +252,7 @@ git commit -m "feat: add cache, latest-click-wins fetch, and DOM rendering to pa
 - Consumes: nothing new.
 - Produces: DOM ids `map-container` (wraps `map`/`map-error`/`legend`, unchanged behavior), `panel-content`, `panel-close` — consumed by `public/panel.js` (Task 2, already written but not yet exercisable) and this task's own manual verification (layout only, no data yet).
 
-- [ ] **Step 1: Restructure `public/index.html`'s `<main>`**
+- [x] **Step 1: Restructure `public/index.html`'s `<main>`**
 
 In `public/index.html`, replace:
 ```html
@@ -278,7 +278,7 @@ with:
     </main>
 ```
 
-- [ ] **Step 2: Update `public/style.css`**
+- [x] **Step 2: Update `public/style.css`**
 
 Replace:
 ```css
@@ -348,7 +348,7 @@ with:
 }
 ```
 
-- [ ] **Step 3: Manual verification (layout only, no data)**
+- [x] **Step 3: Manual verification (layout only, no data)**
 
 ```bash
 cd "C:/Repos/Quali'eau/.claude/worktrees/phase2-carte-nationale/public"
@@ -356,7 +356,7 @@ python -m http.server 8000
 ```
 Open `http://localhost:8000`. Expected: the map still fills the screen exactly as before (visually unchanged — `#map-container` is a transparent wrapper), no `#panel` visible (still `hidden`). Using the browser devtools, remove the `hidden` attribute from `#panel` (`document.getElementById('panel').hidden = false` in the console) — expected: a white sidebar ~380px wide appears on the right with a "✕" button top-right, the map area shrinks to fill the remaining space (MapLibre auto-resizes via its built-in `ResizeObserver`, no code needed). Resize the browser window below 600px wide — expected: the sidebar becomes a bottom sheet instead (fixed to the bottom, rounded top corners, doesn't extend past ~70% of the viewport height). Stop the server when done.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 cd "C:/Repos/Quali'eau/.claude/worktrees/phase2-carte-nationale"
@@ -375,7 +375,7 @@ git commit -m "feat: add commune panel layout (desktop sidebar, mobile bottom sh
 - Consumes: `resolveCodeInsee` from `public/geo_join.js` (already exported, not yet imported by `map.js`); `afficherCommune`, `initPanel` from `public/panel.js` (Task 2).
 - Produces: nothing new for later tasks — this is the final wiring point.
 
-- [ ] **Step 1: Update imports**
+- [x] **Step 1: Update imports**
 
 In `public/map.js`, replace:
 ```js
@@ -389,7 +389,7 @@ import { joindreScoresSurGeojson, resolveCodeInsee } from './geo_join.js';
 import { afficherCommune, initPanel } from './panel.js';
 ```
 
-- [ ] **Step 2: Replace the `onClicCommune` stub**
+- [x] **Step 2: Replace the `onClicCommune` stub**
 
 Replace:
 ```js
@@ -409,7 +409,7 @@ function onClicCommune(event) {
 }
 ```
 
-- [ ] **Step 3: Call `initPanel()` from `initCarte()`**
+- [x] **Step 3: Call `initPanel()` from `initCarte()`**
 
 Replace:
 ```js
@@ -427,7 +427,7 @@ function initCarte() {
   joindreScoresSurGeojson(geojson, carteScores, indicateurActif);
 ```
 
-- [ ] **Step 4: Syntax-check with `node`**
+- [x] **Step 4: Syntax-check with `node`**
 
 ```bash
 cd "C:/Repos/Quali'eau/.claude/worktrees/phase2-carte-nationale"
@@ -436,7 +436,7 @@ node --check /tmp/map_no_imports.js
 ```
 Expected: no output (syntax OK).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd "C:/Repos/Quali'eau/.claude/worktrees/phase2-carte-nationale"
@@ -452,7 +452,7 @@ git commit -m "feat: wire commune click to the fiche panel"
 
 **This task is not a code task** — it walks through the full manual checklist from the design spec (`docs/superpowers/specs/2026-08-06-fiche-communale-design.md`) against the finished feature.
 
-- [ ] **Step 1: Full manual walkthrough**
+- [x] **Step 1: Full manual walkthrough**
 
 ```bash
 cd "C:/Repos/Quali'eau/.claude/worktrees/phase2-carte-nationale/public"
@@ -473,6 +473,6 @@ Open `http://localhost:8000` and confirm every item:
 
 Stop the server (Ctrl+C) when done. If any check fails, fix it as part of this task before proceeding.
 
-- [ ] **Step 2: Report**
+- [x] **Step 2: Report**
 
 Confirm to the user that the fiche communale sub-project (Phase 2, 2/5) is complete and working end-to-end, with a summary of what was verified in Step 1, before moving on to the next sub-project (recherche + géolocalisation).
