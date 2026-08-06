@@ -17,10 +17,15 @@
       </div>
     </header>
     <main>
-      <div id="map"></div>
-      <div id="map-error" hidden>Impossible de charger la carte. Réessayez plus tard.</div>
-      <div id="legend"></div>
-      <aside id="panel"></aside>
+      <div id="map-container">
+        <div id="map"></div>
+        <div id="map-error" hidden>Impossible de charger la carte. Réessayez plus tard.</div>
+        <div id="legend"></div>
+      </div>
+      <aside id="panel" hidden>
+        <button id="panel-close" type="button" aria-label="Fermer la fiche">✕</button>
+        <div id="panel-content"></div>
+      </aside>
     </main>
   </div>
   <script src="https://unpkg.com/maplibre-gl@4/dist/maplibre-gl.js"></script>
