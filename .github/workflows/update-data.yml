@@ -1,0 +1,53 @@
+# Workflow d'actualisation hebdomadaire des données Quali'eau (§5.4)
+#
+# Cadence : chaque lundi à 6h UTC, alignée sur la publication des exports
+# DIS SISE-EAUX sur data.gouv.fr (mise à jour hebdomadaire le lundi).
+# Déclenchable manuellement via workflow_dispatch pour un rafraîchissement
+# hors-cycle ou pour le premier déploiement.
+#
+# Étapes :
+#   1. Téléchargement des ZIPs DIS data.gouv (~900 Mo, 4 années glissantes)
+#   2. Calcul des scores, génération des fiches JSON (§3 + §4)
+#   3. Déploiement du dossier public/ sur la branche gh-pages
+#
+# Contraintes GitHub Actions :
+#   - Durée max d'un job : 6h — largement suffisant (parsing ~900 Mo + scoring
+#     ~35 000 communes ≈ quelques dizaines de minutes)
+#   - Les ZIPs ne sont pas mis en cache (éviter de servir des données périmées ;
+#     le téléchargement est rapide grâce au skip intégré dans download_data.py
+#     quand la taille locale = taille distante)
+
+name: Update water data
+
+on:
+  schedule:
+    - cron: "0 6 * * 1"  # lundi 6h UTC
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python dependencies
+        run: pip install -r pipeline/requirements.txt
+
+      - name: Download DIS data from data.gouv.fr
+        run: python -m pipeline.download_data
+
+      - name: Compute scores and generate static JSON
+        run: python -m pipeline.compute_scores
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
