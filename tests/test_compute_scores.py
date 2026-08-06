@@ -3,7 +3,7 @@ from datetime import date
 import pytest
 
 from pipeline.models import ConclusionBacterio
-from pipeline.compute_scores import selectionner_fenetre_jours, evaluer_bacteriologie
+from pipeline.compute_scores import selectionner_fenetre_jours, evaluer_bacteriologie, construire_carte_scores
 from pipeline.scoring import score_bacteriologie
 
 
@@ -297,9 +297,6 @@ def test_trouver_fichiers_leve_si_absent(tmp_path):
         _trouver_fichiers(str(tmp_path), "DIS_PLV*.txt")
 
 
-from pipeline.compute_scores import construire_carte_scores
-
-
 def test_construire_carte_scores_extrait_scores_commune_complete():
     fiches = {
         "75056": {
@@ -326,4 +323,26 @@ def test_construire_carte_scores_commune_indisponible_a_scores_null():
     carte = construire_carte_scores(fiches)
     assert carte == {
         "99999": {"score_boisson": None, "score_cosmetique": None, "statut_donnees": "indisponible"},
+    }
+
+
+def test_construire_carte_scores_commune_complete_avec_sous_score_absent():
+    # Cas réel observé dans les données de production : une commune "complet"
+    # peut avoir un score de domaine à None si toutes les mesures sous-jacentes
+    # de ce sous-score sont indisponibles (cf. _score_pondere_avec_veto).
+    fiches = {
+        "12345": {
+            "commune": {"code_insee": "12345"},
+            "statut_donnees": "complet",
+            "scores": {
+                "donnees_partielles": True,
+                "boisson": {"score": 72, "veto_sanitaire": False, "sous_scores": {}},
+                "cosmetique": {"score": None, "sous_scores": {}},
+            },
+            "recommandations": [],
+        },
+    }
+    carte = construire_carte_scores(fiches)
+    assert carte == {
+        "12345": {"score_boisson": 72, "score_cosmetique": None, "statut_donnees": "complet"},
     }

@@ -50,7 +50,7 @@ Pas de fusion serveur, pas de nouvelle dépendance Python, un seul fichier auto-
 ```
 
 - Une entrée par commune connue du pipeline (mêmes clés que `fiches`, soit les 34 845 codes INSEE actuels).
-- `score_boisson`/`score_cosmetique` : entiers 0-100, ou `null` si `statut_donnees != "complet"`.
+- `score_boisson`/`score_cosmetique` : entiers 0-100, ou `null` si `statut_donnees != "complet"` — ou, même quand `statut_donnees == "complet"`, si toutes les mesures sous-jacentes à ce sous-score précis sont indisponibles pour la commune (cas réel observé en production, cf. `_score_pondere_avec_veto`).
 - Pas de champ `classe` : les seuils A-E (80/60/40/20, cf. README) sont une constante JS unique, pas dupliqués côté pipeline.
 
 ## Composants livrés

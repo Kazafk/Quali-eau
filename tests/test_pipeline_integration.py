@@ -81,4 +81,8 @@ def test_pipeline_ecrit_carte_scores_json(tmp_path):
     assert "34116" in carte
     assert carte["34116"]["statut_donnees"] == "complet"
     assert isinstance(carte["34116"]["score_boisson"], int)
-    assert carte["34116"]["score_cosmetique"] is None or isinstance(carte["34116"]["score_cosmetique"], int)
+    # La fixture DIS_RESULT_sample.txt ne contient aucun code SANDRE pour
+    # TH/chlore total/pH/métaux (1345/1399/1302/1392-1394), dont dépend
+    # cosmetique.score : il est donc toujours None avec ces données, même si
+    # la commune est "complet" (score_boisson, lui, ne dépend que de 1340/1506 ici).
+    assert carte["34116"]["score_cosmetique"] is None

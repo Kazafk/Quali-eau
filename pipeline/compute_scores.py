@@ -409,7 +409,8 @@ def main(raw_dir: str, output_dir: str, date_reference: date | None = None) -> N
     sous-répertoires annuels, §2.1), utilise le référentiel DIS_COM_UDI le
     plus récent uniquement (snapshot, pas une série temporelle), et écrit
     une fiche JSON par commune sous `output_dir/communes/{code_insee}.json`
-    + un `index.json` global."""
+    + un `index.json` global + un `carte_scores.json` (résumé léger pour
+    la carte nationale, cf. `construire_carte_scores`)."""
     date_reference = date_reference or datetime.now(timezone.utc).date()
     plv_paths = _trouver_fichiers(raw_dir, "DIS_PLV*.txt")
     result_paths = _trouver_fichiers(raw_dir, "DIS_RESULT*.txt")
