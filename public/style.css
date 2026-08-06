@@ -1,0 +1,40 @@
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; height: 100%; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+#app { display: flex; flex-direction: column; height: 100vh; }
+
+#app-header {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+  padding: 10px 16px; background: #0b3d5c; color: #fff;
+}
+#app-header h1 { font-size: 1.1rem; margin: 0; }
+
+#toggle-indicateur { display: flex; gap: 4px; }
+.toggle-btn {
+  border: 1px solid rgba(255, 255, 255, 0.4); background: transparent; color: #fff;
+  padding: 6px 10px; border-radius: 6px; font-size: 0.85rem; cursor: pointer;
+}
+.toggle-btn.active { background: #fff; color: #0b3d5c; font-weight: 600; }
+
+main { position: relative; flex: 1; }
+#map { position: absolute; inset: 0; background: #e8eef2; }
+
+#map-error {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  padding: 24px; text-align: center; background: rgba(255, 255, 255, 0.95); z-index: 5;
+}
+
+#legend {
+  position: absolute; bottom: 16px; left: 16px; z-index: 4;
+  background: rgba(255, 255, 255, 0.92); border-radius: 8px; padding: 10px 12px;
+  font-size: 0.8rem; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+}
+.legend-row { display: flex; align-items: center; gap: 6px; margin: 2px 0; }
+.legend-swatch { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+
+#panel { display: none; }
+
+@media (max-width: 600px) {
+  #app-header { padding: 8px 12px; }
+  #app-header h1 { font-size: 1rem; width: 100%; }
+  #legend { left: 8px; bottom: 8px; font-size: 0.72rem; padding: 8px 10px; }
+}
