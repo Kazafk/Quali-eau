@@ -19,9 +19,13 @@ main { position: relative; flex: 1; }
 #map { position: absolute; inset: 0; background: #e8eef2; }
 
 #map-error {
-  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  position: absolute; inset: 0; align-items: center; justify-content: center;
   padding: 24px; text-align: center; background: rgba(255, 255, 255, 0.95); z-index: 5;
 }
+/* #map-error a display:flex non conditionnel entrerait en conflit de spécificité
+   avec la règle UA [hidden] { display: none }, rendant l'attribut hidden que
+   map.js bascule inopérant (le bandeau resterait visible en permanence). */
+#map-error:not([hidden]) { display: flex; }
 
 #legend {
   position: absolute; bottom: 16px; left: 16px; z-index: 4;
