@@ -61,3 +61,24 @@ def test_pipeline_multi_annees_fusionne_via_main(tmp_path):
     # nitrates 10 (2025) et 12 (2026), tous deux bien en dessous de 50 -> pas de veto,
     # peu importe le poids relatif exact des deux années dans la moyenne pondérée.
     assert fiche["scores"]["boisson"]["veto_sanitaire"] is False
+
+
+def test_pipeline_ecrit_carte_scores_json(tmp_path):
+    raw_dir = tmp_path / "raw"
+    raw_dir.mkdir()
+    import shutil
+    shutil.copy(os.path.join(FIXTURES_DIR, "DIS_PLV_sample.txt"), raw_dir / "DIS_PLV.txt")
+    shutil.copy(os.path.join(FIXTURES_DIR, "DIS_RESULT_sample.txt"), raw_dir / "DIS_RESULT.txt")
+    shutil.copy(os.path.join(FIXTURES_DIR, "DIS_COM_UDI_sample.txt"), raw_dir / "DIS_COM_UDI.txt")
+
+    output_dir = tmp_path / "output"
+    from datetime import date
+    main(raw_dir=str(raw_dir), output_dir=str(output_dir), date_reference=date(2026, 8, 5))
+
+    carte_path = output_dir / "carte_scores.json"
+    assert carte_path.exists()
+    carte = json.loads(carte_path.read_text(encoding="utf-8"))
+    assert "34116" in carte
+    assert carte["34116"]["statut_donnees"] == "complet"
+    assert isinstance(carte["34116"]["score_boisson"], int)
+    assert carte["34116"]["score_cosmetique"] is None or isinstance(carte["34116"]["score_cosmetique"], int)

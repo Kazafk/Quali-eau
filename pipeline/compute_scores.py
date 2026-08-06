@@ -373,6 +373,23 @@ def construire_fiches(plv_paths: list[str], result_paths: list[str], udi_path: s
     return fiches
 
 
+def construire_carte_scores(fiches: dict) -> dict:
+    """Extrait de `fiches` (sortie de construire_fiches) le sous-ensemble
+    minimal nécessaire à la coloration de la carte nationale côté client :
+    score_boisson, score_cosmetique, statut_donnees par commune. N'ajoute
+    aucun champ au schéma existant des fiches (classe A-E, historique,
+    etc. restent hors du pipeline, calculés côté front-end)."""
+    carte = {}
+    for code_insee, fiche in fiches.items():
+        scores = fiche.get("scores")
+        carte[code_insee] = {
+            "score_boisson": scores["boisson"]["score"] if scores else None,
+            "score_cosmetique": scores["cosmetique"]["score"] if scores else None,
+            "statut_donnees": fiche["statut_donnees"],
+        }
+    return carte
+
+
 def _trouver_fichiers(raw_dir: str, motif: str) -> list[str]:
     """Résout tous les fichiers DIS correspondant au motif, à plat dans
     raw_dir OU dans ses sous-répertoires annuels (data/raw/{annee}/...,
@@ -413,6 +430,10 @@ def main(raw_dir: str, output_dir: str, date_reference: date | None = None) -> N
     }
     with open(os.path.join(output_dir, "index.json"), "w", encoding="utf-8") as f:
         json.dump(index, f, ensure_ascii=False, indent=2)
+
+    carte_scores = construire_carte_scores(fiches)
+    with open(os.path.join(output_dir, "carte_scores.json"), "w", encoding="utf-8") as f:
+        json.dump(carte_scores, f, ensure_ascii=False, indent=2)
 
 
 if __name__ == "__main__":

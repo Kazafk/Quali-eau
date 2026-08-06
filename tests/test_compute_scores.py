@@ -295,3 +295,35 @@ def test_trouver_fichiers_recherche_aussi_a_plat(tmp_path):
 def test_trouver_fichiers_leve_si_absent(tmp_path):
     with pytest.raises(FileNotFoundError):
         _trouver_fichiers(str(tmp_path), "DIS_PLV*.txt")
+
+
+from pipeline.compute_scores import construire_carte_scores
+
+
+def test_construire_carte_scores_extrait_scores_commune_complete():
+    fiches = {
+        "75056": {
+            "commune": {"code_insee": "75056"},
+            "statut_donnees": "complet",
+            "scores": {
+                "donnees_partielles": False,
+                "boisson": {"score": 90, "veto_sanitaire": False, "sous_scores": {}},
+                "cosmetique": {"score": 76, "sous_scores": {}},
+            },
+            "recommandations": [],
+        },
+    }
+    carte = construire_carte_scores(fiches)
+    assert carte == {
+        "75056": {"score_boisson": 90, "score_cosmetique": 76, "statut_donnees": "complet"},
+    }
+
+
+def test_construire_carte_scores_commune_indisponible_a_scores_null():
+    fiches = {
+        "99999": {"commune": {"code_insee": "99999"}, "statut_donnees": "indisponible", "scores": None},
+    }
+    carte = construire_carte_scores(fiches)
+    assert carte == {
+        "99999": {"score_boisson": None, "score_cosmetique": None, "statut_donnees": "indisponible"},
+    }
