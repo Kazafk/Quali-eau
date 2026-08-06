@@ -6,7 +6,7 @@ export function suggestionHtml(communes) {
   }
   return communes.map((c) => {
     const dept = c.departement ? ` (${echapperHtml(c.departement.nom)})` : '';
-    return `<li data-code="${echapperHtml(c.code)}" data-nom="${echapperHtml(c.nom)}" data-lon="${c.centre.coordinates[0]}" data-lat="${c.centre.coordinates[1]}">${echapperHtml(c.nom)}${dept}</li>`;
+    return `<li data-code="${echapperHtml(c.code)}" data-nom="${echapperHtml(c.nom)}" data-lon="${echapperHtml(String(c.centre.coordinates[0]))}" data-lat="${echapperHtml(String(c.centre.coordinates[1]))}">${echapperHtml(c.nom)}${dept}</li>`;
   }).join('');
 }
 
@@ -71,6 +71,8 @@ function onSaisie(event) {
 function onClicSuggestion(event) {
   const li = event.target.closest('li[data-code]');
   if (!li) return;
+  if (minuteurDebounce) clearTimeout(minuteurDebounce);
+  requeteRechercheActuelle += 1;
   masquerSuggestions();
   document.getElementById('recherche-input').value = '';
   selectionnerCallback(li.dataset.code, li.dataset.nom, Number(li.dataset.lon), Number(li.dataset.lat));
@@ -105,7 +107,8 @@ async function onClicGeoloc() {
     (erreur) => {
       console.error(erreur);
       afficherErreurRecherche(erreur.code === erreur.PERMISSION_DENIED ? 'Autorisation de géolocalisation refusée.' : 'Position non disponible.');
-    }
+    },
+    { timeout: 10000, maximumAge: 60000 }
   );
 }
 
@@ -114,4 +117,15 @@ export function initRecherche(callbackSelection) {
   document.getElementById('recherche-input').addEventListener('input', onSaisie);
   document.getElementById('recherche-suggestions').addEventListener('click', onClicSuggestion);
   document.getElementById('btn-geoloc').addEventListener('click', onClicGeoloc);
+  document.addEventListener('click', (event) => {
+    if (!document.getElementById('recherche').contains(event.target)) {
+      masquerSuggestions();
+    }
+  });
+  document.getElementById('recherche-input').addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      masquerSuggestions();
+      event.target.blur();
+    }
+  });
 }

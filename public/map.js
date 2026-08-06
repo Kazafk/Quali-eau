@@ -31,6 +31,8 @@ async function chargerDonnees() {
 function afficherErreur() {
   document.getElementById('map-error').hidden = false;
   document.getElementById('map').hidden = true;
+  document.getElementById('recherche-input').disabled = true;
+  document.getElementById('btn-geoloc').disabled = true;
 }
 
 export function selectionnerCommune(code, nom) {
