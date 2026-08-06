@@ -684,8 +684,8 @@ def estimate_cost(param_code: str, value: float) -> dict | None:
 - [x] `public/` : index.html, map.js (MapLibre), style.css, panel.js — vanilla JS, mobile-first.
 - [x] Carte nationale, bascule d'indicateurs Boisson/Cosmétique — **fait, mais par une architecture différente de celle décrite ci-dessus** : pas de `national.geojson` fusionné côté pipeline ; jointure géométrie (tierce, `france-geojson`) + scores (`public/data/carte_scores.json`, nouveau fichier léger) effectuée côté client. Détails et justification : `docs/superpowers/specs/2026-08-06-carte-nationale-design.md`. §5.1/§5.3 ci-dessus restent à corriger dans une future revue de cette spec pour refléter ce choix.
 - [x] Fiche communale au clic (panneau latéral desktop / tiroir bas mobile, doubles jauges, sous-scores, alerte veto sanitaire, recommandations) — **sans historique ni indicateurs bruts** (absents du schéma des fiches, décision produit actée au sous-projet 1). Détails : `docs/superpowers/specs/2026-08-06-fiche-communale-design.md`.
-- [ ] Recherche + géolocalisation via geo.api.gouv.fr (client-side).
-- [ ] Workflow `update-data.yml` + premier déploiement GitHub Pages.
+- [x] Recherche + géolocalisation via geo.api.gouv.fr (client-side) — désambiguïsation par département sur homonymes, réutilise le chemin clic→fiche existant. Détails : `docs/superpowers/specs/2026-08-06-recherche-geolocalisation-design.md`.
+- [x] Workflow `update-data.yml` + premier déploiement GitHub Pages — mis en place directement par l'utilisateur (hors cycle spec/plan), déploiement confirmé réussi.
 - [ ] Page méthodologie.
 
 ### Phase 3 : Fonctionnalités Avancées

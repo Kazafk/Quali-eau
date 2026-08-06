@@ -41,7 +41,7 @@
 - Consumes: `echapperHtml` from `public/panel.js` (already exported, established sub-project 2).
 - Produces: `suggestionHtml(communes: Array<{nom, code, departement: {nom} | null, centre: {coordinates: [number, number]}}>) -> string`. Used internally by Task 2's DOM layer in this same file.
 
-- [ ] **Step 1: Write `public/search.js` with the pure function**
+- [x] **Step 1: Write `public/search.js` with the pure function**
 
 ```js
 import { echapperHtml } from './panel.js';
@@ -57,7 +57,7 @@ export function suggestionHtml(communes) {
 }
 ```
 
-- [ ] **Step 2: Sanity-check with `node`**
+- [x] **Step 2: Sanity-check with `node`**
 
 Run (from the repo root):
 ```bash
@@ -77,7 +77,7 @@ true
 true
 ```
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 cd "C:/Repos/Quali'eau/.claude/worktrees/phase2-carte-nationale"
@@ -96,7 +96,7 @@ git commit -m "feat: add pure suggestion-rendering function for commune search"
 - Consumes: `suggestionHtml` (Task 1, same file); DOM ids `recherche-input`, `recherche-suggestions`, `recherche-erreur`, `btn-geoloc` (Task 3, not yet created — this task's verification is syntax-only, real behavior verified in Task 5 once Tasks 3-4 exist).
 - Produces: `initRecherche(callbackSelection: (code: string, nom: string, lon: number, lat: number) => void) -> void`. Used by `public/map.js` (Task 4), which passes its own `centrerEtSelectionner` as the callback — this indirection avoids a circular import between `map.js` and `search.js`.
 
-- [ ] **Step 1: Append the DOM/fetch layer to `public/search.js`**
+- [x] **Step 1: Append the DOM/fetch layer to `public/search.js`**
 
 ```js
 const RECHERCHE_URL = 'https://geo.api.gouv.fr/communes?fields=nom,code,departement,centre&boost=population&limit=5&nom=';
@@ -206,7 +206,7 @@ export function initRecherche(callbackSelection) {
 }
 ```
 
-- [ ] **Step 2: Syntax-check with `node`**
+- [x] **Step 2: Syntax-check with `node`**
 
 ```bash
 cd "C:/Repos/Quali'eau/.claude/worktrees/phase2-carte-nationale"
@@ -215,7 +215,7 @@ node --check /tmp/search_no_imports.js
 ```
 Expected: no output (syntax OK). DOM/fetch/geolocation behavior cannot run under plain `node` — verified manually in Task 5, once Tasks 3-4 give it a real page and real callback to run against.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 cd "C:/Repos/Quali'eau/.claude/worktrees/phase2-carte-nationale"
@@ -235,7 +235,7 @@ git commit -m "feat: add debounced search, geolocation, and DOM wiring to search
 - Consumes: nothing new.
 - Produces: DOM ids `recherche-input`, `recherche-suggestions`, `recherche-erreur`, `btn-geoloc` — consumed by `public/search.js` (Task 2, already written but not yet exercisable) and this task's own manual verification (layout only, no behavior yet).
 
-- [ ] **Step 1: Update `public/index.html`**
+- [x] **Step 1: Update `public/index.html`**
 
 Replace:
 ```html
@@ -264,7 +264,7 @@ with:
     </header>
 ```
 
-- [ ] **Step 2: Update `public/style.css`**
+- [x] **Step 2: Update `public/style.css`**
 
 Replace:
 ```css
@@ -330,7 +330,7 @@ with:
 }
 ```
 
-- [ ] **Step 3: Manual verification (layout only, no behavior)**
+- [x] **Step 3: Manual verification (layout only, no behavior)**
 
 ```bash
 cd "C:/Repos/Quali'eau/.claude/worktrees/phase2-carte-nationale/public"
@@ -338,7 +338,7 @@ python -m http.server 8000
 ```
 Open `http://localhost:8000`. Expected: a search input with a 📍 button appears in the header between the title and the Boisson/Cosmétique toggle, styled consistently with the dark header (semi-transparent input, white text/placeholder). Typing does nothing yet (no JS wired). Narrow the window below 600px — expected: the search bar drops to its own full-width row (via `order: 3` + `flex-wrap` already on `#app-header`), below the title and toggle buttons. Stop the server when done.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 cd "C:/Repos/Quali'eau/.claude/worktrees/phase2-carte-nationale"
@@ -357,7 +357,7 @@ git commit -m "feat: add search bar and geolocation button to the header"
 - Consumes: `initRecherche` from `public/search.js` (Task 2).
 - Produces: `selectionnerCommune(code: string, nom: string) -> void` (exported, refactor of the existing `onClicCommune` body — same behavior, now reusable), `centrerEtSelectionner(code: string, nom: string, lon: number, lat: number) -> void` (exported, new — flies the map then calls `selectionnerCommune`). These are the final wiring points for this plan.
 
-- [ ] **Step 1: Update imports**
+- [x] **Step 1: Update imports**
 
 Replace:
 ```js
@@ -369,7 +369,7 @@ import { afficherCommune, afficherCommuneSansDonnees, initPanel } from './panel.
 import { initRecherche } from './search.js';
 ```
 
-- [ ] **Step 2: Extract `selectionnerCommune` and add `centrerEtSelectionner`**
+- [x] **Step 2: Extract `selectionnerCommune` and add `centrerEtSelectionner`**
 
 Replace:
 ```js
@@ -405,7 +405,7 @@ export function centrerEtSelectionner(code, nom, lon, lat) {
 }
 ```
 
-- [ ] **Step 3: Call `initRecherche` from `initCarte()`**
+- [x] **Step 3: Call `initRecherche` from `initCarte()`**
 
 Replace:
 ```js
@@ -425,7 +425,7 @@ function initCarte() {
   joindreScoresSurGeojson(geojson, carteScores, indicateurActif);
 ```
 
-- [ ] **Step 4: Syntax-check with `node`**
+- [x] **Step 4: Syntax-check with `node`**
 
 ```bash
 cd "C:/Repos/Quali'eau/.claude/worktrees/phase2-carte-nationale"
@@ -434,7 +434,7 @@ node --check /tmp/map_no_imports.js
 ```
 Expected: no output (syntax OK).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd "C:/Repos/Quali'eau/.claude/worktrees/phase2-carte-nationale"
@@ -450,7 +450,7 @@ git commit -m "feat: wire search and geolocation to the map and panel"
 
 **This task is not a code task** — it walks through the full manual checklist from the design spec (`docs/superpowers/specs/2026-08-06-recherche-geolocalisation-design.md`) against the finished feature.
 
-- [ ] **Step 1: Full manual walkthrough**
+- [x] **Step 1: Full manual walkthrough**
 
 ```bash
 cd "C:/Repos/Quali'eau/.claude/worktrees/phase2-carte-nationale/public"
@@ -469,6 +469,6 @@ Open `http://localhost:8000` and confirm every item:
 
 Stop the server (Ctrl+C) when done. If any check fails, fix it as part of this task before proceeding.
 
-- [ ] **Step 2: Report**
+- [x] **Step 2: Report**
 
 Confirm to the user that the recherche + géolocalisation sub-project (Phase 2, 3/5) is complete and working end-to-end, with a summary of what was verified in Step 1, before moving on to the next sub-project (déploiement CI GitHub Pages).
