@@ -1,5 +1,15 @@
 import { classeFromScore } from './scoring.js';
 
+const LABELS_SOUS_SCORES = {
+  securite_sanitaire: 'Sécurité sanitaire',
+  mineraux_equilibre: 'Minéraux & équilibre',
+  gout_organoleptique: 'Goût & saveur',
+  durete_calcaire: 'Dureté & calcaire',
+  chlore_agressivite: 'Chlore & agressivité',
+  respect_ph: 'Respect du pH',
+  metaux_depots: 'Métaux & dépôts',
+};
+
 export function echapperHtml(texte) {
   return String(texte)
     .replace(/&/g, '&amp;')
@@ -16,7 +26,7 @@ export function jaugeHtml(titre, score, sousScores, vetoSanitaire) {
   const c = classeFromScore(score);
   const alerte = vetoSanitaire ? '<p class="jauge-veto">⚠ Alerte sanitaire</p>' : '';
   const lignes = Object.entries(sousScores || {})
-    .map(([cle, valeur]) => `<div class="sous-score-row"><span>${cle}</span><span>${valeur == null ? '—' : valeur}</span></div>`)
+    .map(([cle, valeur]) => `<div class="sous-score-row"><span>${LABELS_SOUS_SCORES[cle] || cle}</span><span>${valeur == null ? '—' : valeur}</span></div>`)
     .join('');
   return `
     <div class="jauge">
@@ -76,6 +86,13 @@ function rendreFiche(nom, codeInsee, fiche) {
 function afficherErreurPanneau(nom) {
   document.getElementById('panel-content').innerHTML =
     `<h2>${echapperHtml(nom)}</h2><p class="panel-erreur">Impossible de charger les données de cette commune. Réessayez plus tard.</p>`;
+}
+
+export function afficherCommuneSansDonnees(nom) {
+  ouvrirPanneau();
+  requeteActuelle += 1; // invalide toute requête déjà en vol pour une commune précédente
+  document.getElementById('panel-content').innerHTML =
+    `<h2>${echapperHtml(nom)}</h2><p class="panel-indispo">Aucune donnée disponible pour cette commune.</p>`;
 }
 
 export async function afficherCommune(codeInsee, nom) {
