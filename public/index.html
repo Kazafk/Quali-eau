@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quali'eau — Qualité de l'eau du robinet en France</title>
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4/dist/maplibre-gl.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <header id="app-header">
+      <h1>💧 Quali'eau</h1>
+      <div id="toggle-indicateur">
+        <button id="btn-boisson" class="toggle-btn active" type="button">🥤 Boisson &amp; Santé</button>
+        <button id="btn-cosmetique" class="toggle-btn" type="button">🧴 Cosmétique &amp; Lavage</button>
+      </div>
+    </header>
+    <main>
+      <div id="map"></div>
+      <div id="map-error" hidden>Impossible de charger la carte. Réessayez plus tard.</div>
+      <div id="legend"></div>
+      <aside id="panel"></aside>
+    </main>
+  </div>
+  <script src="https://unpkg.com/maplibre-gl@4/dist/maplibre-gl.js"></script>
+  <script type="module" src="map.js"></script>
+</body>
+</html>

@@ -676,13 +676,13 @@ def estimate_cost(param_code: str, value: float) -> dict | None:
 - [x] Revue & consolidation : codes SANDRE vérifiés sur API réelle, formules corrigées, cas limites (v1.1).
 - [x] Décision d'architecture : site 100 % statique GitHub Pages (v1.2).
 - [x] Correction du veto sanitaire nitrates/nitrites, clarification LQ/recalcul des sommes, module d'estimation budgétaire des équipements (v1.3).
-- [ ] `pipeline/download_data.py` : téléchargement/extraction des ZIPs DIS data.gouv.
-- [ ] `pipeline/compute_scores.py` : parsing DIS_PLV/DIS_RESULT, agrégation §2.5, ScoringEngine §3 (incl. `P_nitrates`), `estimate_cost()` (§5.6), génération des fiches + `national.geojson` + `index.json`.
+- [x] `pipeline/download_data.py` : téléchargement/extraction des ZIPs DIS data.gouv.
+- [x] `pipeline/compute_scores.py` : parsing DIS_PLV/DIS_RESULT, agrégation §2.5, ScoringEngine §3 (incl. `P_nitrates`), `estimate_cost()` (§5.6), génération des fiches + `index.json` (`national.geojson` remplacé par une approche différente, voir Phase 2 ci-dessous).
 - [ ] Tests unitaires sur 50 communes représentatives (eaux douces, dures, agricoles, urbaines, multi-UDI, PLM, cas < LQ, vetos sanitaires — incl. cas nitrates > 50 mg/L isolé).
 
 ### Phase 2 : Site Statique
-- [ ] `public/` : index.html, map.js (MapLibre), panel.js, style.css — vanilla JS, mobile-first.
-- [ ] Carte nationale (chargement `national.geojson`, bascules d'indicateurs).
+- [ ] `public/` : index.html, map.js (MapLibre), style.css — **fait** ; `panel.js` (fiche communale) — sous-projet 2, pas encore fait.
+- [x] Carte nationale, bascule d'indicateurs Boisson/Cosmétique — **fait, mais par une architecture différente de celle décrite ci-dessus** : pas de `national.geojson` fusionné côté pipeline ; jointure géométrie (tierce, `france-geojson`) + scores (`public/data/carte_scores.json`, nouveau fichier léger) effectuée côté client. Détails et justification : `docs/superpowers/specs/2026-08-06-carte-nationale-design.md`. §5.1/§5.3 ci-dessus restent à corriger dans une future revue de cette spec pour refléter ce choix.
 - [ ] Fiche communale (lazy-loading, doubles jauges, historique, recommandations).
 - [ ] Recherche + géolocalisation via geo.api.gouv.fr (client-side).
 - [ ] Workflow `update-data.yml` + premier déploiement GitHub Pages.
