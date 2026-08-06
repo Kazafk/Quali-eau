@@ -1,5 +1,6 @@
 import { NO_DATA, SCORE_THRESHOLDS } from './scoring.js';
-import { joindreScoresSurGeojson } from './geo_join.js';
+import { joindreScoresSurGeojson, resolveCodeInsee } from './geo_join.js';
+import { afficherCommune, initPanel } from './panel.js';
 
 const CARTE_SCORES_URL = './data/carte_scores.json';
 // Épinglé au dernier commit ayant touché ce fichier (vérifié via l'API GitHub) plutôt
@@ -33,9 +34,8 @@ function afficherErreur() {
 
 function onClicCommune(event) {
   const feature = event.features[0];
-  // Stub : la fiche communale au clic est un sous-projet futur, non
-  // implémenté ici.
-  console.log('Commune cliquée (fiche à venir) :', feature.properties.code);
+  const code = resolveCodeInsee(feature.properties.code);
+  afficherCommune(code, feature.properties.nom);
 }
 
 function renderLegend() {
@@ -67,6 +67,7 @@ function initBascule() {
 function initCarte() {
   renderLegend();
   initBascule();
+  initPanel();
   joindreScoresSurGeojson(geojson, carteScores, indicateurActif);
 
   map = new maplibregl.Map({
