@@ -88,11 +88,11 @@ function afficherErreurPanneau(nom) {
     `<h2>${echapperHtml(nom)}</h2><p class="panel-erreur">Impossible de charger les données de cette commune. Réessayez plus tard.</p>`;
 }
 
-export function afficherCommuneSansDonnees(nom) {
+export function afficherCommuneSansDonnees(codeInsee, nom) {
   ouvrirPanneau();
   requeteActuelle += 1; // invalide toute requête déjà en vol pour une commune précédente
   document.getElementById('panel-content').innerHTML =
-    `<h2>${echapperHtml(nom)}</h2><p class="panel-indispo">Aucune donnée disponible pour cette commune.</p>`;
+    `<h2>${echapperHtml(nom)}</h2><p class="panel-code">${codeInsee}</p><p class="panel-indispo">Aucune donnée disponible pour cette commune.</p>`;
 }
 
 export async function afficherCommune(codeInsee, nom) {

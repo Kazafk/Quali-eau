@@ -36,7 +36,7 @@ function onClicCommune(event) {
   const feature = event.features[0];
   const code = resolveCodeInsee(feature.properties.code);
   if (!carteScores[code]) {
-    afficherCommuneSansDonnees(feature.properties.nom);
+    afficherCommuneSansDonnees(code, feature.properties.nom);
     return;
   }
   afficherCommune(code, feature.properties.nom);
